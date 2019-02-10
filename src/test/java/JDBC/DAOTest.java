@@ -9,15 +9,15 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import javax.sql.DataSource;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlToolError;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -42,11 +42,11 @@ public class DAOTest {
 	myDAO = new DAO(myDataSource);
     }
     
-    @BeforeClass
+    @Before
     public static void setUpClass() {
     }
     
-    @AfterClass
+    @After
     public static void tearDownClass() {
     }
     
