@@ -6,6 +6,7 @@
 package JDBC;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +30,7 @@ public class DAO {
      * @param dataSource la source de données à utiliser
      */
     public DAO(DataSource dataSource) {
-        this.myDataSource = dataSource;
+        myDataSource = dataSource;
     }
 
     /**
@@ -59,21 +60,44 @@ public class DAO {
         return result;
     }
     
-    public List<CustomerEntity> getCustomerByName(String name) throws DAOException{
-        List<CustomerEntity> res = new ArrayList();
-        String sql = "SELECT * FROM CUSTOMER WHERE NAME = ?";
+    public CustomerEntity getCustomerByEmail(String email) throws DAOException{
+        CustomerEntity res=null;
+        String sql = "SELECT * FROM CUSTOMER WHERE EMAIL LIKE ?";
         try(Connection connexion = myDataSource.getConnection();
             PreparedStatement stmt = connexion.prepareStatement(sql);){
-            stmt.setString(1,name);
+            stmt.setString(1,email);
             try(ResultSet r = stmt.executeQuery()){
-                while (r.next()){ // Tant qu'il y a des enregistrements
-                    // On récupère les champs nécessaires de l'enregistrement courant
+                if(r.next()){
                     int id = r.getInt("CUSTOMER_ID");
-                    String address = r.getString("ADDRESSLINE1");
-                    // On crée l'objet entité
-                    CustomerEntity c = new CustomerEntity(id, name, address);
-                    // On l'ajoute à la liste des résultats
-                    res.add(c);
+                    String name = r.getString("EMAIL");
+                    res = new CustomerEntity(id, name, email);
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    public List<PurchaseOrder> getPurchaseOrderByClient (int id) throws DAOException{
+        List<PurchaseOrder> res = new ArrayList();
+        String sql = "SELECT * FROM PURCHASE_ORDER WHERE CUSTOMER_ID = ?";
+        try(Connection connexion = myDataSource.getConnection();
+            PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1,id);
+            try(ResultSet r = stmt.executeQuery()){
+                while (r.next()){
+                    int orderNum = r.getInt("order_num");
+                    int customerId = r.getInt("customer_id");
+                    int productId=r.getInt("product_id");
+                    int quantity=r.getInt("quantity");
+                    float shippingCost=r.getFloat("shipping_cost");
+                    Date salesDate=r.getDate("sales_date");
+                    Date shippingDate=r.getDate("shipping_date");
+                    String freightCompany=r.getString("freight_company");
+                    res.add(new PurchaseOrder(orderNum, customerId, productId, quantity, shippingCost, salesDate, shippingDate, freightCompany));
                 }
             }
         }

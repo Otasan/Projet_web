@@ -80,10 +80,23 @@ public class DAOTest {
 	}
         
         @Test
-        public void testGetCustomerByName() throws DAOException{
-            int id = myDAO.getCustomerByName("Jumbo Eagle Corp").get(0).getCustomerId();
-            assertEquals(1,id);
-            assertEquals(0,myDAO.getCustomerByName("a").size());
+        public void testGetCustomerByEmail() throws DAOException{
+            int id = myDAO.getCustomerByEmail("jumboeagle@example.com").getCustomerId();
+            assertEquals("1 failed",1,id);
+            try{
+                myDAO.getCustomerByEmail("o").getCustomerId();
+                fail();
+            }
+            catch(Exception ex){
+                
+            }
+        }
+        
+        @Test
+        public void testgetPurchaseOrderByClient() throws DAOException{
+            for(PurchaseOrder p: myDAO.getPurchaseOrderByClient(1)){
+                assertTrue("Ah "+p.getOrderNum(),p.getOrderNum() == 10398001 || p.getOrderNum() == 10398005);
+            }
         }
     
 }

@@ -13,12 +13,12 @@ public class CustomerEntity {
 	// TODO : ajouter les autres propriétés
 	private int customerId;
 	private String name;
-	private String addressLine1;
+	private String email;
 
-	public CustomerEntity(int customerId, String name, String addressLine1) {
+	public CustomerEntity(int customerId, String name, String email) {
 		this.customerId = customerId;
 		this.name = name;
-		this.addressLine1 = addressLine1;
+		this.email = email;
 	}
 
 	/**
@@ -44,8 +44,8 @@ public class CustomerEntity {
 	 *
 	 * @return the value of addressLine1
 	 */
-	public String getAddressLine1() {
-		return addressLine1;
+	public String getEmail() {
+		return email;
 	}
 
 
