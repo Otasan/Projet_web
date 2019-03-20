@@ -60,6 +60,12 @@ public class DAO {
         return result;
     }
     
+    /**
+     * returns Customer information by using email as an identifyer
+     * @param email
+     * @return
+     * @throws DAOException 
+     */
     public CustomerEntity getCustomerByEmail(String email) throws DAOException{
         CustomerEntity res=null;
         String sql = "SELECT * FROM CUSTOMER WHERE EMAIL LIKE ?";
@@ -81,9 +87,15 @@ public class DAO {
         return res;
     }
     
+    /**
+     * Returns all the purchase orders made by customer with the given id
+     * @param id
+     * @return
+     * @throws DAOException 
+     */
     public List<PurchaseOrder> getPurchaseOrderByClient (int id) throws DAOException{
         List<PurchaseOrder> res = new ArrayList();
-        String sql = "SELECT * FROM PURCHASE_ORDER WHERE CUSTOMER_ID = ?";
+        String sql = "SELECT * FROM PURCHASE_ORDER INNER JOIN PRODUCT USING(PRODUCT_ID) WHERE CUSTOMER_ID = ?";
         try(Connection connexion = myDataSource.getConnection();
             PreparedStatement stmt = connexion.prepareStatement(sql);){
             stmt.setInt(1,id);
@@ -91,13 +103,12 @@ public class DAO {
                 while (r.next()){
                     int orderNum = r.getInt("order_num");
                     int customerId = r.getInt("customer_id");
-                    int productId=r.getInt("product_id");
-                    int quantity=r.getInt("quantity");
-                    float shippingCost=r.getFloat("shipping_cost");
+                    String product=r.getString("description");
+                    Prix price = getPrix(orderNum);
                     Date salesDate=r.getDate("sales_date");
                     Date shippingDate=r.getDate("shipping_date");
                     String freightCompany=r.getString("freight_company");
-                    res.add(new PurchaseOrder(orderNum, customerId, productId, quantity, shippingCost, salesDate, shippingDate, freightCompany));
+                    res.add(new PurchaseOrder(orderNum, customerId, product, price, salesDate, shippingDate, freightCompany));
                 }
             }
         }
@@ -106,5 +117,66 @@ public class DAO {
             throw new DAOException(ex.getMessage());
         }
         return res;
+    }
+    
+    /**
+     * get discount rate for a specific order.
+     * Used by getPrix
+     * @param orderNum
+     * @return
+     * @throws DAOException 
+     */
+    public float getRate(int orderNum) throws DAOException{
+        float rate =0;
+        //récupère uniquement la remise
+        String sqlRate = "SELECT RATE FROM APP.PURCHASE_ORDER \n" +
+                        "INNER JOIN APP.CUSTOMER USING (CUSTOMER_ID) \n" +
+                        "INNER JOIN APP.PRODUCT USING (PRODUCT_ID) \n" +
+                        "INNER JOIN APP.PRODUCT_CODE ON PROD_CODE=PRODUCT_CODE \n" +
+                        "INNER JOIN APP.DISCOUNT_CODE ON APP.DISCOUNT_CODE.DISCOUNT_CODE=APP.CUSTOMER.DISCOUNT_CODE \n" +
+                        "WHERE ORDER_NUM = ? AND APP.DISCOUNT_CODE.DISCOUNT_CODE=APP.PRODUCT_CODE.DISCOUNT_CODE";
+        try(Connection connexion = myDataSource.getConnection();
+            PreparedStatement stmt = connexion.prepareStatement(sqlRate);){
+            stmt.setInt(1,orderNum);
+            try(ResultSet r = stmt.executeQuery()){
+                if(r.next()){
+                    rate = r.getInt("RATE");
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return rate;
+    }
+    
+    /**
+     * get price from one order as a Prix object.
+     * Used by getPurchaseOrder
+     * @param orderNum
+     * @return
+     * @throws DAOException 
+     */
+    public Prix getPrix(int orderNum) throws DAOException{
+        float rate = getRate(orderNum);
+        Prix p = null;
+        String sql = "Select SHIPPING_COST, PURCHASE_COST, QUANTITY FROM PURCHASE_ORDER "
+                + "INNER JOIN PRODUCT USING(PRODUCT_ID) "
+                + "WHERE ORDER_NUM = ?";
+        try(Connection connexion = myDataSource.getConnection();
+            PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1,orderNum);
+            try(ResultSet r = stmt.executeQuery()){
+                if(r.next()){
+                    p = new Prix(rate, r.getFloat("PURCHASE_COST"), r.getFloat("SHIPPING_COST"), r.getInt("QUANTITY"));
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return p;
     }
 }

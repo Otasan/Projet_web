@@ -29,6 +29,7 @@ public class DAOTest {
 	private DAO myDAO; // L'objet à tester
 	private DataSource myDataSource; // La source de données à utiliser
 	private static Connection myConnection ; // La connection à la BD de test
+        private Prix myPrix;
 	
 
 	@Before
@@ -79,6 +80,10 @@ public class DAOTest {
 		assertEquals(13, result);
 	}
         
+        /**
+         * Test of the method getCustomerByEmail of class DAO
+         * @throws DAOException 
+         */
         @Test
         public void testGetCustomerByEmail() throws DAOException{
             int id = myDAO.getCustomerByEmail("jumboeagle@example.com").getCustomerId();
@@ -87,16 +92,28 @@ public class DAOTest {
                 myDAO.getCustomerByEmail("o").getCustomerId();
                 fail();
             }
-            catch(Exception ex){
-                
-            }
+            catch(Exception ex){}
         }
         
+        /**
+         * Test of the method getPurchaseOrderByClient of class DAO
+         * @throws DAOException 
+         */
         @Test
         public void testgetPurchaseOrderByClient() throws DAOException{
             for(PurchaseOrder p: myDAO.getPurchaseOrderByClient(1)){
                 assertTrue("Ah "+p.getOrderNum(),p.getOrderNum() == 10398001 || p.getOrderNum() == 10398005);
             }
+        }
+        
+        @Test
+        public void testPrix(){
+            float rate = 0;
+            float shipping = 10;
+            float price = 10;
+            int quantity = 1;
+            myPrix = new Prix(rate, shipping,price, quantity);
+            assertEquals(price*quantity*(1-rate/100)+shipping, myPrix.total(), 0.01);
         }
     
 }
