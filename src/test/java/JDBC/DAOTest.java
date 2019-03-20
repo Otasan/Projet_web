@@ -106,6 +106,9 @@ public class DAOTest {
             }
         }
         
+        /**
+         * Test for the class Prix
+         */
         @Test
         public void testPrix(){
             float rate = 0;
