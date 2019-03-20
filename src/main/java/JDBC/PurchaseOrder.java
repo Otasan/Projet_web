@@ -17,19 +17,17 @@ import java.sql.Date;
 public class PurchaseOrder{
     private int orderNum;
     private int customerId;
-    private int productId;
-    private int quantity;
-    private float shippingCost;
+    private String product;
+    private Prix price;
     private Date salesDate;
     private Date shippingDate;
     private String freightCompany;
 
-    public PurchaseOrder(int orderNum, int customerId, int productId, int quantity, float shippingCost, Date salesDate, Date shippingDate, String freightCompany) {
+    public PurchaseOrder(int orderNum, int customerId, String product, Prix price, Date salesDate, Date shippingDate, String freightCompany) {
         this.orderNum = orderNum;
         this.customerId = customerId;
-        this.productId=productId;
-        this.quantity=quantity;
-        this.shippingCost=shippingCost;
+        this.product=product;
+        this.price=price;
         this.salesDate=salesDate;
         this.shippingDate=shippingDate;
         this.freightCompany=freightCompany;
@@ -38,31 +36,38 @@ public class PurchaseOrder{
     public Integer getOrderNum() {
         return orderNum;
     }
-    
     public int getCustomerId(){
         return customerId;
     }
-    
-    public int getProductId(){
-        return productId;
+    public String getProduct(){
+        return product;
     }
-
-    public int getQuantity() {
-        return quantity;
+    public Prix getPrice() {
+        return price;
     }
-
-    public float getShippingCost() {
-        return shippingCost;
-    }
-
     public Date getSalesDate() {
         return salesDate;
     }
-
     public Date getShippingDate() {
         return shippingDate;
     }
     public String getFreightCompany() {
         return freightCompany;
+    }
+    
+    public float getTotalPrice(){
+        return price.total();
+    }
+    public float getDiscount(){
+        return price.getDiscountRate();
+    }
+    public float getShipping(){
+        return price.getShippingCost();
+    }
+    public float getPurchaseCost(){
+        return price.getPurchasePrice();
+    }
+    public int getQuantity(){
+        return price.getQuantity();
     }
 }
