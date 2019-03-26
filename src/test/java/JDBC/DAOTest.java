@@ -71,9 +71,9 @@ public class DAOTest {
 	}
 	
 	/**
-	 * Test of numberOfCustomers method, of class DAO.
-	 * @throws simplejdbc.DAOException
-	 */
+         * Test of numberOfCustomers method, of class DAO
+         * @throws DAOException 
+         */
 	@Test
 	public void testNumberOfCustomers() throws DAOException {
 		int result = myDAO.numberOfCustomers();
@@ -118,5 +118,17 @@ public class DAOTest {
             myPrix = new Prix(rate, shipping,price, quantity);
             assertEquals(price*quantity*(1-rate/100)+shipping, myPrix.total(), 0.01);
         }
+        
+        /**
+         * Test of the methode identification of class DAO
+         * @throws DAOException
+         */
+        @Test
+        public void testIdentification() throws DAOException{
+            int id = 25;
+            String email = "www.wrencomp.example.com";
+            assertEquals(id, myDAO.identification(email));
+        }
     
+        
 }

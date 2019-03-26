@@ -179,4 +179,128 @@ public class DAO {
         }
         return p;
     }
+    
+    /**
+     * Retourne l'ID d'un client pour une adresse mail.
+     * @param email
+     * @return
+     * @throws DAOException 
+     */
+    public int identification(String email) throws DAOException{
+        int res = -1;
+        String sql = "SELECT CUSTOMER_ID FROM CUSTOMER WHERE EMAIL = ?";
+        try(Connection connexion = myDataSource.getConnection();
+            PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setString(1,email);
+            try(ResultSet r = stmt.executeQuery()){
+                if(r.next()){
+                    res = r.getInt("CUSTOMER_ID");
+                }
+                else{
+                    throw new DAOException("Client : "+email+" introuvable");
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    /**
+     * Renvoie Product_ID à partir de la description.
+     * @param name
+     * @return
+     * @throws DAOException 
+     */
+    public int getProductIdByName(String name) throws DAOException{
+        String sql = "SELECT PRODUCT_ID FROM PRODUCT WHERE DESCRIPTION=?";
+        int prod=-1;
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setString(1,name);
+            try(ResultSet r = stmt.executeQuery()){
+                if(r.next()){
+                    prod = r.getInt("PRODUCT_ID");
+                }
+                else{
+                    throw new DAOException("Produit : "+name+" introuvable");
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return prod;
+    }
+    
+    /**
+     * Permet de modifier une commande pour le order_num précisé dans p.
+     * @param p
+     * @throws DAOException 
+     */
+    public void modifierCommande(PurchaseOrder p) throws DAOException{
+        int produit = getProductIdByName(p.getProduct());
+        String sql = "UPDATE PURCHASE_ORDER "
+                + "SET PRODUCT_ID = ?, "
+                + "QUANTITY = ?, "
+                + "WHERE ORDER_NUM = ?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, produit);
+            stmt.setInt(2, p.getQuantity());
+            stmt.setInt(3, p.getOrderNum());
+            stmt.executeUpdate();
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+    }
+    
+    /**
+     * Supprime l'entrée dont le Order_num est précisée dans p.
+     * @param p
+     * @throws DAOException 
+     */
+    public void supprimerCommande(PurchaseOrder p) throws DAOException{
+        String sql="DELETE FROM PURCHASE_ORDER WHERE ORDER_NUM = ?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, p.getOrderNum());
+            stmt.executeUpdate();
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+    }
+    
+    /**
+     * Ajoute une la commmande p à la table Purchase_order
+     * @param p
+     * @throws DAOException 
+     */
+    public void ajouterCommande(PurchaseOrder p) throws DAOException{
+        String sql="INSERT INTO PURCHASE_ORDER VALUES(?,?,?,?,?,?,?,?)";
+        int product_id = getProductIdByName(p.getProduct());
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, p.getOrderNum());
+            stmt.setInt(2, p.getCustomerId());
+            stmt.setInt(3, product_id);
+            stmt.setInt(4, p.getQuantity());
+            stmt.setFloat(5, p.getShipping());
+            stmt.setDate(6, p.getSalesDate());
+            stmt.setDate(7, p.getShippingDate());
+            stmt.setString(8, p.getFreightCompany());
+            stmt.executeUpdate();
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+    }
 }
