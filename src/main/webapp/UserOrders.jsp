@@ -31,20 +31,21 @@
             <tbody>
                 <% 
                     List<PurchaseOrder> purchase = (List) request.getAttribute("orders");
-                    for(PurchaseOrder p: purchase){ 
+                    for(PurchaseOrder p: purchase){ //debut de la boucle
                         int num =p.getOrderNum();
                         String pro =p.getProduct();
                         int qte = p.getQuantity();
                         double price = p.getTotalPrice();
                 %>
                 <tr>
-                    <th>${num}</th>
-                    <td>${pro}</td>
-                    <td>${qte}</td>
-                    <td>${price}</td>
+                    <!--affichage des données séléctionnées-->
+                    <th><%=num%></th>
+                    <td><%=pro%></td>
+                    <td><%=qte%></td>
+                    <td><%=price%></td>
                     <td><button type="button" class="btn btn-secondary">Modifier la commande</button></td>
                 </tr>
-                <% } %>
+                <% } //fin de la boucle %>
             </tbody>
         </table>
     </body>
