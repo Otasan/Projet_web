@@ -5,8 +5,10 @@
  */
 package Servlets;
 
+import JDBC.DAO;
+import JDBC.DAOException;
+import JDBC.DataSourceFactory;
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,13 +43,25 @@ public class LoginController extends HttpServlet {
         }
     }
     
-    protected void checkLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    protected void checkLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String mdp = request.getParameter("mdp");
         String jspView="";
         if(email!=null&&mdp!=null){
             if(email.equals("admin@admin.ad") && mdp.equals("1234")){
                 jspView="Connecte.jsp";
+            }
+            else{
+                try{
+                    DAO dao = new DAO(DataSourceFactory.getDataSource());
+                    String predictedMdp = ""+dao.identification(email);
+                    if(mdp.equals(predictedMdp)){
+                        jspView="Connecte.jsp";
+                    }
+                }
+                catch(DAOException ex){
+                    System.out.println(ex);
+                }
             }
         }
         request.getRequestDispatcher(jspView).forward(request, response);
