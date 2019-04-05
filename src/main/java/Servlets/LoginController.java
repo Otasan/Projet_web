@@ -106,4 +106,11 @@ public class LoginController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+
+    protected void checkLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        String jspView="";
+        jspView="Logout.jsp";
+        request.getRequestDispatcher(jspView).forward(request, response);
+    }
 }
+
