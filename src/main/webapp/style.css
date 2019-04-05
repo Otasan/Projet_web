@@ -1,0 +1,13 @@
+/*Page LoginPassword*/
+
+.h4{
+    background: linear-gradient(to bottom right, #228494, rgb(61, 201, 226));
+    padding:50px;
+    text-transform:uppercase;
+    color:white;
+    letter-spacing:2px;
+    margin-bottom:20px;
+    border-radius:10px;
+}
+
+/*Page Commandes - Client*/
