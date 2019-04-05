@@ -8,12 +8,15 @@ package Servlets;
 import JDBC.DAO;
 import JDBC.DAOException;
 import JDBC.DataSourceFactory;
+import Listener.UtilisateursConnectes;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -39,6 +42,7 @@ public class LoginController extends HttpServlet {
                 checkLogin(request, response);
                 break;
             case "logout":
+                checkLogout(request, response);
                 break;
         }
     }
@@ -49,14 +53,21 @@ public class LoginController extends HttpServlet {
         String jspView="";
         if(email!=null&&mdp!=null){
             if(email.equals("admin@admin.ad") && mdp.equals("1234")){
-                jspView="Connecte.jsp";
+                jspView="Connecte.jsp"; //TODO: Créer la page admin
             }
             else{
                 try{
                     DAO dao = new DAO(DataSourceFactory.getDataSource());
                     String predictedMdp = ""+dao.identification(email);
                     if(mdp.equals(predictedMdp)){
-                        jspView="Connecte.jsp";
+                        jspView="UserOrders.jsp";
+                        request.setAttribute("Customer", mdp);
+                        ajouterCommandes(mdp, request, dao);
+                        HttpSession session = request.getSession(true); // démarre la session
+			session.setAttribute("email", email);
+                    }
+                    else{
+                        jspView="Login.jsp";
                     }
                 }
                 catch(DAOException ex){
@@ -108,9 +119,17 @@ public class LoginController extends HttpServlet {
 
 
     protected void checkLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-        String jspView="";
-        jspView="Logout.jsp";
+        HttpSession session = request.getSession(false);
+        if(session != null){
+            session.invalidate();
+        }
+        String jspView="Login.jsp";
         request.getRequestDispatcher(jspView).forward(request, response);
+    }
+    
+    protected void ajouterCommandes(String mdp, HttpServletRequest request, DAO dao) throws DAOException{
+        List mesCommandes = dao.getPurchaseOrderByClient(Integer.parseInt(mdp));
+        request.setAttribute("orders", mesCommandes);
     }
 }
 
