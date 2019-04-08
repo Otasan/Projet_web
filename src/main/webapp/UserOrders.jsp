@@ -31,7 +31,7 @@
                     </th>
                 </tr>
             </thead>
-        <!--Ici code JSP-->
+        <!--Ici code J S P-->
             <tbody>
                 <% 
                     List<PurchaseOrder> purchase = (List) request.getAttribute("orders");
