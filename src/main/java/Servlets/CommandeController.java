@@ -50,13 +50,14 @@ public class CommandeController extends HttpServlet {
             if (action != null) {
                 switch (action) {
                     case "new":
-                        nouvelleCommande(request, response, dao);
+                        nouvelleCommande(request, response, dao, id);
                         break;
                     case "valider":
                         validerCommande(request, response, dao, id);
                         break;
                     case "updatePrix":
-                        calculPrix(request, response, id, dao);
+                        Prix p = calculPrix(request, response, id, dao);
+                        updatePrix(request, response, dao, p);
                         break;
                     case "supprimer":
                         int num = Integer.parseInt(request.getParameter("num"));
@@ -65,7 +66,7 @@ public class CommandeController extends HttpServlet {
                         break;
                     case "modifier":
                         int nume = Integer.parseInt(request.getParameter("num"));
-                        updateCommande(request, response, dao, nume);
+                        updateCommande(request, response, dao, nume, id);
                         break;
                 }
             }
@@ -79,20 +80,24 @@ public class CommandeController extends HttpServlet {
         }
     }
 
-    protected void nouvelleCommande(HttpServletRequest request, HttpServletResponse response, DAO dao) throws ServletException, IOException, DAOException {
+    protected void nouvelleCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws ServletException, IOException, DAOException {
         List<String> products = dao.listeProduits();
         request.setAttribute("products", products);
         request.setAttribute("selected", products.get(0));
+        Prix p = dao.getPrix(1, products.get(0), idClient);
+        request.setAttribute("prix", p.total());
         request.setAttribute("id", -1);
         request.setAttribute("quantite", 1);
         request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
     }
     
-    protected void updateCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int num) throws ServletException, IOException, DAOException {
+    protected void updateCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int num, int idClient) throws ServletException, IOException, DAOException {
         List<String> products = dao.listeProduits();
         PurchaseOrder p = dao.getPurchaseOrder(num);
         request.setAttribute("products", products);
         request.setAttribute("selected", p.getProduct());
+        Prix pr = dao.getPrix(p.getQuantity(), p.getProduct(), idClient);
+        request.setAttribute("prix", pr.total());
         request.setAttribute("id", num);
         request.setAttribute("quantite", p.getQuantity());
         request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
@@ -166,6 +171,16 @@ public class CommandeController extends HttpServlet {
         List mesCommandes = dao.getPurchaseOrderByClient(idClient);
         request.setAttribute("orders", mesCommandes);
         request.getRequestDispatcher("UserOrders.jsp").forward(request, response);
+    }
+    
+    private void updatePrix(HttpServletRequest request, HttpServletResponse response, DAO dao, Prix pr) throws DAOException, ServletException, IOException{
+        List<String> products = dao.listeProduits();
+        request.setAttribute("products", products);
+        request.setAttribute("selected", request.getParameter("produit"));
+        request.setAttribute("prix", pr.total());
+        request.setAttribute("id", Integer.parseInt(request.getParameter("id")));
+        request.setAttribute("quantite", Integer.parseInt(request.getParameter("quantite")));
+        request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
     }
 
 }

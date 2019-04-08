@@ -391,7 +391,7 @@ public class DAO {
     }
     
     /**
-     * Trouve aléatoirement un ID commande qui n'est pas utilisé actuellement
+     * Trouve aléatoirement un ID commande positif qui n'est pas utilisé actuellement
      * @return
      * @throws DAOException 
      */
@@ -412,7 +412,7 @@ public class DAO {
         }
         Random rand = new Random();
         int res = rand.nextInt();
-        while(lesID.contains(res) && res<=0){
+        while(lesID.contains(res) || res<=0){
             res=rand.nextInt();
         }
         return res;

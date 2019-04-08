@@ -61,13 +61,21 @@
                         <input type="number" name="quantite" min="1" value="<%=val%>"/>
                     </td>
                     <td>
+                        <%=request.getAttribute("prix")%>
                         <!--Prix calculé à partir de la commande-->
                     </td>
                     <td>
-                        <button type="submit" name="action" value="valider">Valider la commande</button>
+                        <button id="target" type="submit" name="action" value="valider">Valider la commande</button>
                     </td>
                 </tr>
             </table>
         </form>
     </body>
+    <script   src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>
+            $("input, select").change(function(){
+                $("#target").attr("value", "updatePrix");
+                $("#target").click();
+            });
+    </script> 
 </html>
