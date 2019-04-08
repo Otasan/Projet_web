@@ -11,19 +11,21 @@ package JDBC;
  */
 public class Prix {
     private float purchasePrice;
+    private float markup;
     private float discountRate;
     private float shippingCost;
     private int quantite;
     
-    public Prix(float rate, float prix, float livraison, int qte){
+    public Prix(float rate, float prix, float marge, float livraison, int qte){
         purchasePrice=prix;
+        markup = marge;
         discountRate=rate;
         shippingCost=livraison;
         quantite = qte;
     }
     
     public float total(){
-        return purchasePrice*quantite*(1-discountRate/100)+shippingCost;
+        return purchasePrice*(1+markup/100)*(1-discountRate/100)*quantite+shippingCost;
     }
     
     public float getPurchasePrice(){
@@ -37,5 +39,11 @@ public class Prix {
     }
     public int getQuantity(){
         return quantite;
+    }
+    public float getMarkup(){
+        return markup;
+    }
+    public void setQuantity(int qte){
+        quantite = qte;
     }
 }

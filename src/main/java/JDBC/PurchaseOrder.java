@@ -15,7 +15,7 @@ import java.sql.Date;
  */
 
 public class PurchaseOrder{
-    private int orderNum;
+    private final int orderNum;
     private int customerId;
     private String product;
     private Prix price;
@@ -31,6 +31,14 @@ public class PurchaseOrder{
         this.salesDate=salesDate;
         this.shippingDate=shippingDate;
         this.freightCompany=freightCompany;
+    }
+    
+    public PurchaseOrder(int orderNum, int customerId, String product, Prix price, java.util.Date salesDate){
+        this.orderNum = orderNum;
+        this.customerId = customerId;
+        this.product=product;
+        this.price=price;
+        this.salesDate=new Date(salesDate.getTime());
     }
 
     public Integer getOrderNum() {
@@ -58,6 +66,9 @@ public class PurchaseOrder{
     public float getTotalPrice(){
         return price.total();
     }
+    public float getMarkup(){
+        return price.getMarkup();
+    }
     public float getDiscount(){
         return price.getDiscountRate();
     }
@@ -69,5 +80,12 @@ public class PurchaseOrder{
     }
     public int getQuantity(){
         return price.getQuantity();
+    }
+    
+    public void setQuantity(int qte){
+        price.setQuantity(qte);
+    }
+    public void setProduct(String prod){
+        product=prod;
     }
 }

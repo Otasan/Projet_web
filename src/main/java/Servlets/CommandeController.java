@@ -5,13 +5,22 @@
  */
 package Servlets;
 
+import JDBC.DAO;
+import JDBC.DAOException;
+import JDBC.DataSourceFactory;
+import JDBC.Prix;
+import JDBC.PurchaseOrder;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -31,19 +40,62 @@ public class CommandeController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet CommandeController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet CommandeController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        HttpSession session = request.getSession();
+        String mail = (String) session.getAttribute("email");
+        DAO dao = new DAO(DataSourceFactory.getDataSource());
+        try {
+            int id = dao.identification(mail);
+
+            String action = request.getParameter("action");
+            if (action != null) {
+                switch (action) {
+                    case "new":
+                        nouvelleCommande(request, response, dao);
+                        break;
+                    case "valider":
+                        validerCommande(request, response, dao, id);
+                        break;
+                    case "updatePrix":
+                        calculPrix(request, response, id, dao);
+                        break;
+                    case "supprimer":
+                        int num = Integer.parseInt(request.getParameter("num"));
+                        dao.supprimerCommande(num);
+                        displayCommande(request, response, dao, id);
+                        break;
+                    case "modifier":
+                        int nume = Integer.parseInt(request.getParameter("num"));
+                        updateCommande(request, response, dao, nume);
+                        break;
+                }
+            }
+        } catch (DAOException ex) {
+            Logger.getLogger(CommandeController.class.getName()).log(Level.SEVERE, null, ex);
+            session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            request.getRequestDispatcher("Login.jsp").forward(request, response);
         }
+    }
+
+    protected void nouvelleCommande(HttpServletRequest request, HttpServletResponse response, DAO dao) throws ServletException, IOException, DAOException {
+        List<String> products = dao.listeProduits();
+        request.setAttribute("products", products);
+        request.setAttribute("selected", products.get(0));
+        request.setAttribute("id", -1);
+        request.setAttribute("quantite", 1);
+        request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
+    }
+    
+    protected void updateCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int num) throws ServletException, IOException, DAOException {
+        List<String> products = dao.listeProduits();
+        PurchaseOrder p = dao.getPurchaseOrder(num);
+        request.setAttribute("products", products);
+        request.setAttribute("selected", p.getProduct());
+        request.setAttribute("id", num);
+        request.setAttribute("quantite", p.getQuantity());
+        request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -84,5 +136,36 @@ public class CommandeController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    protected void validerCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws DAOException, ServletException, IOException {
+        int num = Integer.parseInt(request.getParameter("id"));
+        String product = (String)request.getParameter("produit");
+        int qte =Integer.parseInt(request.getParameter("quantite"));
+        if(num<=0){
+            num=dao.nouveauIDCommande();
+            PurchaseOrder p = new PurchaseOrder(num, idClient, product, dao.getPrix(qte, product, idClient), new Date());
+            dao.ajouterCommande(p);
+        }
+        else{
+            PurchaseOrder p = dao.getPurchaseOrder(num);
+            p.setQuantity(qte);
+            p.setProduct(product);
+            dao.modifierCommande(p);
+        }
+        displayCommande(request, response, dao, idClient);
+    }
+
+    private Prix calculPrix(HttpServletRequest request, HttpServletResponse response, int id, DAO dao) throws DAOException {
+        int qte = Integer.parseInt(request.getParameter("quantite"));
+        String product = (String)request.getParameter("produit");
+        Prix p = dao.getPrix(qte, product, id);
+        return p;
+    }
+
+    private void displayCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws DAOException, ServletException, IOException {
+        List mesCommandes = dao.getPurchaseOrderByClient(idClient);
+        request.setAttribute("orders", mesCommandes);
+        request.getRequestDispatcher("UserOrders.jsp").forward(request, response);
+    }
 
 }

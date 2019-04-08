@@ -113,9 +113,10 @@ public class DAOTest {
         public void testPrix(){
             float rate = 0;
             float shipping = 10;
+            float markup = 0;
             float price = 10;
             int quantity = 1;
-            myPrix = new Prix(rate, shipping,price, quantity);
+            myPrix = new Prix(rate, shipping, markup, price, quantity);
             assertEquals(price*quantity*(1-rate/100)+shipping, myPrix.total(), 0.01);
         }
         

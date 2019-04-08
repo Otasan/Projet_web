@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -151,6 +152,30 @@ public class DAO {
         return rate;
     }
     
+    public float getRate(int client, int produit) throws DAOException{
+        float rate = 0;
+        String sql = "SELECT RATE FROM DISCOUNT_CODE "
+                + "INNER JOIN CUSTOMER USING (DISCOUNT_CODE) "
+                + "INNER JOIN PRODUCT_CODE USING(DISCOUNT_CODE) "
+                + "INNER JOIN PRODUCT ON PRODUCT.PRODUCT_CODE=PRODUCT_CODE.PROD_CODE "
+                + "WHERE PRODUCT_ID=? AND CUSTOMER_ID=?";
+        try(Connection connexion = myDataSource.getConnection();
+            PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1,produit);
+            stmt.setInt(2,client);
+            try(ResultSet r = stmt.executeQuery()){
+                if(r.next()){
+                    rate = r.getInt("RATE");
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return rate;
+    }
+    
     /**
      * get price from one order as a Prix object.
      * Used by getPurchaseOrder
@@ -161,7 +186,7 @@ public class DAO {
     public Prix getPrix(int orderNum) throws DAOException{
         float rate = getRate(orderNum);
         Prix p = null;
-        String sql = "Select SHIPPING_COST, PURCHASE_COST, QUANTITY FROM PURCHASE_ORDER "
+        String sql = "Select SHIPPING_COST, PURCHASE_COST, QUANTITY, MARKUP FROM PURCHASE_ORDER "
                 + "INNER JOIN PRODUCT USING(PRODUCT_ID) "
                 + "WHERE ORDER_NUM = ?";
         try(Connection connexion = myDataSource.getConnection();
@@ -169,7 +194,28 @@ public class DAO {
             stmt.setInt(1,orderNum);
             try(ResultSet r = stmt.executeQuery()){
                 if(r.next()){
-                    p = new Prix(rate, r.getFloat("PURCHASE_COST"), r.getFloat("SHIPPING_COST"), r.getInt("QUANTITY"));
+                    p = new Prix(rate, r.getFloat("PURCHASE_COST"), r.getFloat("MARKUP"), r.getFloat("SHIPPING_COST"), r.getInt("QUANTITY"));
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return p;
+    }
+    
+    public Prix getPrix(int quantite, String produit, int client) throws DAOException{
+        int idProduit = getProductIdByName(produit);
+        float rate = getRate(client, idProduit);
+        Prix p=null;
+        String sqlProduit = "Select PURCHASE_COST, MARKUP FROM PRODUCT WHERE PRODUCT_ID=? ";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sqlProduit);){
+            stmt.setInt(1,idProduit);
+            try(ResultSet rs =stmt.executeQuery()){
+                if(rs.next()){
+                    p = new Prix(rate, rs.getFloat("PURCHASE_COST"), rs.getFloat("MARKUP"), 0, quantite);
                 }
             }
         }
@@ -245,7 +291,7 @@ public class DAO {
         int produit = getProductIdByName(p.getProduct());
         String sql = "UPDATE PURCHASE_ORDER "
                 + "SET PRODUCT_ID = ?, "
-                + "QUANTITY = ?, "
+                + "QUANTITY = ? "
                 + "WHERE ORDER_NUM = ?";
         try(Connection connexion = myDataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(sql);){
@@ -279,6 +325,24 @@ public class DAO {
     }
     
     /**
+     * supprime la commande de numéro num
+     * @param num
+     * @throws DAOException 
+     */
+    public void supprimerCommande(int num) throws DAOException{
+        String sql="DELETE FROM PURCHASE_ORDER WHERE ORDER_NUM = ?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, num);
+            stmt.executeUpdate();
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+    }
+    
+    /**
      * Ajoute une la commmande p à la table Purchase_order
      * @param p
      * @throws DAOException 
@@ -302,5 +366,89 @@ public class DAO {
             Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
             throw new DAOException(ex.getMessage());
         }
+    }
+    
+    /**
+     * 
+     * @return une List de tous les attributs "DESCRIPTION" de la table product
+     * @throws DAOException 
+     */
+    public List<String> listeProduits() throws DAOException{
+        String sql = "SELECT DESCRIPTION FROM PRODUCT";
+        ArrayList<String> res = new ArrayList();
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                res.add(rs.getString("DESCRIPTION"));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    /**
+     * Trouve aléatoirement un ID commande qui n'est pas utilisé actuellement
+     * @return
+     * @throws DAOException 
+     */
+    public int nouveauIDCommande() throws DAOException{
+        String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER";
+        ArrayList<Integer> lesID = new ArrayList();
+        
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                lesID.add(rs.getInt("ORDER_NUM"));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        Random rand = new Random();
+        int res = rand.nextInt();
+        while(lesID.contains(res) && res<=0){
+            res=rand.nextInt();
+        }
+        return res;
+    }
+    
+    /**
+     * retourne la PurchaseOrder Ayant le numero num
+     * @param num
+     * @return
+     * @throws DAOException 
+     */
+    public PurchaseOrder getPurchaseOrder(int num) throws DAOException{
+        PurchaseOrder p = null;
+        String sql = "SELECT * FROM PURCHASE_ORDER "
+                + "INNER JOIN PRODUCT USING (PRODUCT_ID) "
+                + "WHERE ORDER_NUM=?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, num);
+            try(ResultSet r = stmt.executeQuery();){
+                if(r.next()){
+                    int orderNum = r.getInt("order_num");
+                    int customerId = r.getInt("customer_id");
+                    String product=r.getString("description");
+                    Prix price = getPrix(orderNum);
+                    Date salesDate=r.getDate("sales_date");
+                    Date shippingDate=r.getDate("shipping_date");
+                    String freightCompany=r.getString("freight_company");
+                    p= new PurchaseOrder(orderNum, customerId, product, price, salesDate, shippingDate, freightCompany);
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return p;
     }
 }
