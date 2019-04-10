@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import javax.sql.DataSource;
 import org.hsqldb.cmdline.SqlFile;
@@ -131,5 +132,42 @@ public class DAOTest {
             assertEquals(id, myDAO.identification(email));
         }
     
+        /**
+         * Test la methode getProductByName
+         * @throws DAOException 
+         */
+        @Test
+        public void testGetProductByName() throws DAOException{
+            int id = 980001;
+            String desc = "Identity Server";
+            assertEquals(id, myDAO.getProductIdByName(desc));
+        }
         
+        /**
+         * Test la methode modifierCommande
+         * @throws DAOException 
+         */
+        @Test
+        public void testModifierCommande() throws DAOException{
+            PurchaseOrder p = myDAO.getPurchaseOrderByClient(1).get(0);
+            PurchaseOrder p1 = new PurchaseOrder(p.getOrderNum(), p.getCustomerId(), p.getProduct(), new Prix(0,0,0,0,5), p.getSalesDate());
+            myDAO.modifierCommande(p1);
+            assertNotEquals(p.getQuantity(), myDAO.getPurchaseOrderByClient(1).get(0).getQuantity());
+            myDAO.modifierCommande(p);
+            assertEquals(p.getQuantity(), myDAO.getPurchaseOrderByClient(1).get(0).getQuantity());
+        }
+        
+        /**
+         * Test les methodes supprimerCommande, ajouterCommande et nouveauIDCommande
+         * @throws DAOException 
+         */
+        @Test
+        public void testSupprimerCommande() throws DAOException{
+            int id = myDAO.nouveauIDCommande();
+            PurchaseOrder p1 = new PurchaseOrder(id, 1, "Identity Server", new Prix(0,0,0,0,1), new Date());
+            myDAO.ajouterCommande(p1);
+            assertNotNull(myDAO.getPurchaseOrder(id));
+            myDAO.supprimerCommande(id);
+            assertNull(myDAO.getPurchaseOrder(id));
+        }
 }

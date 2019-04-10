@@ -92,6 +92,16 @@ public class CommandeController extends HttpServlet {
         }
     }
 
+    /**
+     * Permet d'ouvrir la page ChangeOrder.jsp anvec les parametres nécéssaires pour une nouvelle commande
+     * @param request
+     * @param response
+     * @param dao
+     * @param idClient
+     * @throws ServletException
+     * @throws IOException
+     * @throws DAOException 
+     */
     protected void nouvelleCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws ServletException, IOException, DAOException {
         List<String> products = dao.listeNomsProduits();
         request.setAttribute("products", products);
@@ -103,6 +113,17 @@ public class CommandeController extends HttpServlet {
         request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
     }
     
+    /**
+     * Permet d'ouvrir la page ChangeOrder.jsp anvec les parametres nécéssaires pour une commande existante
+     * @param request
+     * @param response
+     * @param dao
+     * @param num
+     * @param idClient
+     * @throws ServletException
+     * @throws IOException
+     * @throws DAOException 
+     */
     protected void updateCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int num, int idClient) throws ServletException, IOException, DAOException {
         List<String> products = dao.listeNomsProduits();
         PurchaseOrder p = dao.getPurchaseOrder(num);
@@ -154,6 +175,16 @@ public class CommandeController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    /**
+     * Ajoute la commande modifiée/nouvelle commande dans la base de données et renvoie à la page UserOrders.jsp
+     * @param request
+     * @param response
+     * @param dao
+     * @param idClient
+     * @throws DAOException
+     * @throws ServletException
+     * @throws IOException 
+     */
     protected void validerCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws DAOException, ServletException, IOException {
         int num = Integer.parseInt(request.getParameter("id"));
         String product = (String)request.getParameter("produit");
@@ -172,6 +203,15 @@ public class CommandeController extends HttpServlet {
         displayCommande(request, response, dao, idClient);
     }
 
+    /**
+     * calcul le prix pour une comande en cours d'édition. Utilisée lors de l'affichage automatique du prix sur la page ChangeOrder.jsp
+     * @param request
+     * @param response
+     * @param id
+     * @param dao
+     * @return
+     * @throws DAOException 
+     */
     private Prix calculPrix(HttpServletRequest request, HttpServletResponse response, int id, DAO dao) throws DAOException {
         int qte = Integer.parseInt(request.getParameter("quantite"));
         String product = (String)request.getParameter("produit");
@@ -179,12 +219,32 @@ public class CommandeController extends HttpServlet {
         return p;
     }
 
+    /**
+     * affiche la page UserOrders.jsp pour l'utilisateur connecté
+     * @param request
+     * @param response
+     * @param dao
+     * @param idClient
+     * @throws DAOException
+     * @throws ServletException
+     * @throws IOException 
+     */
     private void displayCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws DAOException, ServletException, IOException {
         List mesCommandes = dao.getPurchaseOrderByClient(idClient);
         request.setAttribute("orders", mesCommandes);
         request.getRequestDispatcher("UserOrders.jsp").forward(request, response);
     }
     
+    /**
+     * Mets à jour le prix dans la page ChangeOrder.jsp. Utilisée lors de l'affichage automatique du prix sur la page ChangeOrder.jsp
+     * @param request
+     * @param response
+     * @param dao
+     * @param pr
+     * @throws DAOException
+     * @throws ServletException
+     * @throws IOException 
+     */
     private void updatePrix(HttpServletRequest request, HttpServletResponse response, DAO dao, Prix pr) throws DAOException, ServletException, IOException{
         List<String> products = dao.listeNomsProduits();
         request.setAttribute("products", products);
@@ -195,12 +255,30 @@ public class CommandeController extends HttpServlet {
         request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
     }
     
+    /**
+     * affiche la page TableProduit.jsp pour l'utilisateur connecté
+     * @param request
+     * @param response
+     * @param dao
+     * @throws DAOException
+     * @throws ServletException
+     * @throws IOException 
+     */
     private void listeProduit(HttpServletRequest request, HttpServletResponse response, DAO dao) throws DAOException, ServletException, IOException{
         List<ProductEntity> products = dao.listeProduits();
         request.setAttribute("produits", products);
         request.getRequestDispatcher("TableProduit.jsp").forward(request, response);
     }
 
+    /**
+     * affiche la page TableFournisseur.jsp pour l'utilisateur connecté
+     * @param request
+     * @param response
+     * @param dao
+     * @throws DAOException
+     * @throws ServletException
+     * @throws IOException 
+     */
     private void listeManufacturer(HttpServletRequest request, HttpServletResponse response, DAO dao) throws DAOException, ServletException, IOException {
         List<ManufacturerEntity> manufaturers = dao.listeManufacturer();
         request.setAttribute("manufaturers", manufaturers);

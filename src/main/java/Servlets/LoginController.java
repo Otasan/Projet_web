@@ -52,6 +52,13 @@ public class LoginController extends HttpServlet {
         }
     }
     
+    /**
+     * vérifie si le mail et le mot de passe entré par l'utilisateur sont valides et rediriqe vers la page appropriée
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
     protected void checkLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String mdp = request.getParameter("mdp");
@@ -123,6 +130,13 @@ public class LoginController extends HttpServlet {
     }// </editor-fold>
 
 
+    /**
+     * permet à un utilisateur de cloturer sa session.
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
     protected void checkLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         HttpSession session = request.getSession(false);
         if(session != null){
@@ -132,6 +146,13 @@ public class LoginController extends HttpServlet {
         request.getRequestDispatcher(jspView).forward(request, response);
     }
     
+    /**
+     * permet le premier affichage de la page UserOrders.jsp après la connection de l'utilisateur
+     * @param mdp
+     * @param request
+     * @param dao
+     * @throws DAOException 
+     */
     protected void ajouterCommandes(String mdp, HttpServletRequest request, DAO dao) throws DAOException{
         List mesCommandes = dao.getPurchaseOrderByClient(Integer.parseInt(mdp));
         request.setAttribute("orders", mesCommandes);

@@ -152,6 +152,13 @@ public class DAO {
         return rate;
     }
     
+    /**
+     * get discount rate for a specific user and product.
+     * @param client
+     * @param produit
+     * @return
+     * @throws DAOException 
+     */
     public float getRate(int client, int produit) throws DAOException{
         float rate = 0;
         String sql = "SELECT RATE FROM DISCOUNT_CODE "
@@ -205,6 +212,14 @@ public class DAO {
         return p;
     }
     
+    /**
+     * get price for the quantity of a product for a client.
+     * @param quantite
+     * @param produit
+     * @param client
+     * @return
+     * @throws DAOException 
+     */
     public Prix getPrix(int quantite, String produit, int client) throws DAOException{
         int idProduit = getProductIdByName(produit);
         float rate = getRate(client, idProduit);
@@ -454,7 +469,7 @@ public class DAO {
     
     /**
      * 
-     * @return une Liste de ProductEntity représentant la relatino PRODUCT
+     * @return une Liste de ProductEntity représentant la relatinon PRODUCT
      * @throws DAOException 
      */
     public List<ProductEntity> listeProduits() throws DAOException{
@@ -481,6 +496,11 @@ public class DAO {
         return res;
     }
     
+    /**
+     * 
+     * @return une Liste de ManufacturerEntity représentant la relatinon MANUFACTURER
+     * @throws DAOException 
+     */
     public List<ManufacturerEntity> listeManufacturer() throws DAOException{
         ArrayList<ManufacturerEntity> res = new ArrayList();
         String sql="SELECT * FROM MANUFACTURER";
@@ -505,6 +525,12 @@ public class DAO {
         return res;
     }
 
+    /**
+     * 
+     * @param mail
+     * @return le nom du client ayant l'email mail
+     * @throws DAOException 
+     */
     public String getCustomerName(String mail) throws DAOException {
         String res="";
         String sql = "SELECT NAME FROM CUSTOMER WHERE EMAIL=?";
