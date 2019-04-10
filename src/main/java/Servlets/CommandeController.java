@@ -9,6 +9,7 @@ import JDBC.DAO;
 import JDBC.DAOException;
 import JDBC.DataSourceFactory;
 import JDBC.Prix;
+import JDBC.ProductEntity;
 import JDBC.PurchaseOrder;
 import java.io.IOException;
 import java.util.Date;
@@ -40,7 +41,7 @@ public class CommandeController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         String mail = (String) session.getAttribute("email");
         DAO dao = new DAO(DataSourceFactory.getDataSource());
         try {
@@ -68,6 +69,12 @@ public class CommandeController extends HttpServlet {
                         int nume = Integer.parseInt(request.getParameter("num"));
                         updateCommande(request, response, dao, nume, id);
                         break;
+                    case "products":
+                        listeProduit(request, response, dao);
+                        break;
+                    case "afficher":
+                        displayCommande(request, response, dao, id);
+                        break;
                 }
             }
         } catch (DAOException ex) {
@@ -81,7 +88,7 @@ public class CommandeController extends HttpServlet {
     }
 
     protected void nouvelleCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int idClient) throws ServletException, IOException, DAOException {
-        List<String> products = dao.listeProduits();
+        List<String> products = dao.listeNomsProduits();
         request.setAttribute("products", products);
         request.setAttribute("selected", products.get(0));
         Prix p = dao.getPrix(1, products.get(0), idClient);
@@ -92,7 +99,7 @@ public class CommandeController extends HttpServlet {
     }
     
     protected void updateCommande(HttpServletRequest request, HttpServletResponse response, DAO dao, int num, int idClient) throws ServletException, IOException, DAOException {
-        List<String> products = dao.listeProduits();
+        List<String> products = dao.listeNomsProduits();
         PurchaseOrder p = dao.getPurchaseOrder(num);
         request.setAttribute("products", products);
         request.setAttribute("selected", p.getProduct());
@@ -174,13 +181,19 @@ public class CommandeController extends HttpServlet {
     }
     
     private void updatePrix(HttpServletRequest request, HttpServletResponse response, DAO dao, Prix pr) throws DAOException, ServletException, IOException{
-        List<String> products = dao.listeProduits();
+        List<String> products = dao.listeNomsProduits();
         request.setAttribute("products", products);
         request.setAttribute("selected", request.getParameter("produit"));
         request.setAttribute("prix", pr.total());
         request.setAttribute("id", Integer.parseInt(request.getParameter("id")));
         request.setAttribute("quantite", Integer.parseInt(request.getParameter("quantite")));
         request.getRequestDispatcher("ChangeOrder.jsp").forward(request, response);
+    }
+    
+    private void listeProduit(HttpServletRequest request, HttpServletResponse response, DAO dao) throws DAOException, ServletException, IOException{
+        List<ProductEntity> products = dao.listeProduits();
+        request.setAttribute("produits", products);
+        request.getRequestDispatcher("TableProduit.jsp").forward(request, response);
     }
 
 }

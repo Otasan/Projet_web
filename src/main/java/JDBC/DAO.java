@@ -373,7 +373,7 @@ public class DAO {
      * @return une List de tous les attributs "DESCRIPTION" de la table product
      * @throws DAOException 
      */
-    public List<String> listeProduits() throws DAOException{
+    public List<String> listeNomsProduits() throws DAOException{
         String sql = "SELECT DESCRIPTION FROM PRODUCT";
         ArrayList<String> res = new ArrayList();
         try(Connection connexion = myDataSource.getConnection();
@@ -450,5 +450,34 @@ public class DAO {
             throw new DAOException(ex.getMessage());
         }
         return p;
+    }
+    
+    /**
+     * 
+     * @return une Liste de ProductEntity représentant la relatino PRODUCT
+     * @throws DAOException 
+     */
+    public List<ProductEntity> listeProduits() throws DAOException{
+        String sql = "SELECT * FROM PRODUCT "
+                + "INNER JOIN MANUFACTURER USING(MANUFACTURER_ID) "
+                + "ORDER BY PRODUCT_CODE, DESCRIPTION ASC";
+        ArrayList<ProductEntity> res = new ArrayList();
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                int id = rs.getInt("PRODUCT_ID");
+                String manu = rs.getString("NAME");
+                String code = rs.getString("PRODUCT_CODE");
+                float cost = rs.getFloat("PURCHASE_COST");
+                String nom = rs.getString("DESCRIPTION");
+                res.add(new ProductEntity(id, manu, code, cost, nom));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
     }
 }

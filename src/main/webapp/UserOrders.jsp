@@ -52,9 +52,13 @@
                 <hr class="sidebar-divider my-0">
 
                 <li class="nav-item active">
-                    <a class="nav-link" href="Client.html">
-                        <i class="fas fa-fw fa-tachometer-alt"></i>
-                        <span>Profil</span></a>
+                    <!--Retour vers commandes-->
+                    <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
+                        <button type="submit" name="action" value="afficher" class="nav-link bg-primary" >
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            Profil
+                        </button>
+                    </form>
                 </li>
 
                 <!-- Divider -->
@@ -68,9 +72,13 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="tableproduit.html">
-                        <i class="fas fa-fw fa-table"></i>
-                        <span>Liste des produits</span></a>
+                    <!--Liste produits-->
+                    <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
+                        <button type="submit" name="action" value="products" class="nav-link bg-primary" >
+                            <i class="fas fa-fw fa-table"></i>
+                            Liste des produits
+                        </button>
+                    </form>
                 </li>
 
                 <li class="nav-item">
@@ -170,45 +178,50 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Identifiant Commande</th>
-                                                    <th>Article</th>
-                                                    <th>Quantité</th>
-                                                    <th>Prix TTC</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <!--Ici code J S P-->
-                                                <%
-                                                    List<PurchaseOrder> purchase = (List) request.getAttribute("orders");
-                                                    for (PurchaseOrder p : purchase) { //debut de la boucle
-                                                        int num = p.getOrderNum();
-                                                        String pro = p.getProduct();
-                                                        int qte = p.getQuantity();
-                                                        double price = p.getTotalPrice();
-                                                %>
-                                                <!--affichage des données séléctionnées-->
-                                                <tr>
-                                                    <th><%=num%></th>
-                                                    <td><%=pro%></td>
-                                                    <td><%=qte%></td>
-                                                    <td><%=price%></td>
-                                                    <td>
-
-                                                        <input type="hidden" value="<%=num%>" name="num">
-                                                        <button type="submit" name="action" value="modifier" class="btn btn-secondary">Modifier la commande</button>
-                                                    </td>
-                                                    <td>
-                                                        <button type="submit" name="action" value="supprimer" class="btn btn-secondary">Supprimer la commande</button>
-                                                    </td>
-                                                </tr>
-                                                <%}%>
-                                            </tbody>
-                                        </table>
-                                    </form>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Identifiant Commande</th>
+                                                <th>Article</th>
+                                                <th>Quantité</th>
+                                                <th>Prix TTC</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!--Ici code J S P-->
+                                            <%
+                                                List<PurchaseOrder> purchase = (List) request.getAttribute("orders");
+                                                for (PurchaseOrder p : purchase) { //debut de la boucle
+                                                    int num = p.getOrderNum();
+                                                    String pro = p.getProduct();
+                                                    int qte = p.getQuantity();
+                                                    double price = p.getTotalPrice();
+                                            %>
+                                            <!--affichage des données séléctionnées-->
+                                            <tr>
+                                                <th><%=num%></th>
+                                                <td><%=pro%></td>
+                                                <td><%=qte%></td>
+                                                <td><%=price%></td>
+                                                <td>
+                                                    <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
+                                                        <table>
+                                                            <tr>
+                                                                <td>
+                                                                    <input type="hidden" value="<%=num%>" name="num">
+                                                                    <button type="submit" name="action" value="modifier" class="btn btn-secondary">Modifier la commande</button>
+                                                                </td>
+                                                                <td>
+                                                                    <button type="submit" name="action" value="supprimer" class="btn btn-secondary">Supprimer la commande</button>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <%}%>
+                                        </tbody>
+                                    </table>
 
                                 </div>
                             </div>
