@@ -8,6 +8,7 @@ package Servlets;
 import JDBC.DAO;
 import JDBC.DAOException;
 import JDBC.DataSourceFactory;
+import JDBC.ManufacturerEntity;
 import JDBC.Prix;
 import JDBC.ProductEntity;
 import JDBC.PurchaseOrder;
@@ -46,6 +47,7 @@ public class CommandeController extends HttpServlet {
         DAO dao = new DAO(DataSourceFactory.getDataSource());
         try {
             int id = dao.identification(mail);
+            request.setAttribute("user", dao.getCustomerName(mail));
 
             String action = request.getParameter("action");
             if (action != null) {
@@ -71,6 +73,9 @@ public class CommandeController extends HttpServlet {
                         break;
                     case "products":
                         listeProduit(request, response, dao);
+                        break;
+                    case "fournisseurs":
+                        listeManufacturer(request, response, dao);
                         break;
                     case "afficher":
                         displayCommande(request, response, dao, id);
@@ -194,6 +199,12 @@ public class CommandeController extends HttpServlet {
         List<ProductEntity> products = dao.listeProduits();
         request.setAttribute("produits", products);
         request.getRequestDispatcher("TableProduit.jsp").forward(request, response);
+    }
+
+    private void listeManufacturer(HttpServletRequest request, HttpServletResponse response, DAO dao) throws DAOException, ServletException, IOException {
+        List<ManufacturerEntity> manufaturers = dao.listeManufacturer();
+        request.setAttribute("manufaturers", manufaturers);
+        request.getRequestDispatcher("TableFournisseur.jsp").forward(request, response);
     }
 
 }

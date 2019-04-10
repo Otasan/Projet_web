@@ -67,9 +67,13 @@
 
                 <!-- Nav Item - Tables -->
                 <li class="nav-item">
-                    <a class="nav-link" href="tablefournisseur.html">
-                        <i class="fas fa-fw fa-table"></i>
-                        <span>Liste des fournisseurs</span></a>
+                    <!--liste des fournisseurs-->
+                    <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
+                        <button type="submit" name="action" value="fournisseurs" class="nav-link bg-primary" >
+                            <i class="fas fa-fw fa-table"></i>
+                            Liste des fournisseurs
+                        </button>
+                    </form>
                 </li>
 
                 <li class="nav-item">
@@ -144,7 +148,7 @@
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Client</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><%=(String) request.getAttribute("user")%></span>
                                 <img class="img-profile rounded-circle" src="data:image/png;base64,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">
                             </a>
                             <!-- Dropdown - User Information -->

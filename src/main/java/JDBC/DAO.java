@@ -480,4 +480,47 @@ public class DAO {
         }
         return res;
     }
+    
+    public List<ManufacturerEntity> listeManufacturer() throws DAOException{
+        ArrayList<ManufacturerEntity> res = new ArrayList();
+        String sql="SELECT * FROM MANUFACTURER";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                int id = rs.getInt("MANUFACTURER_ID");
+                String name = rs.getString("NAME");
+                String city = rs.getString("CITY");
+                String state = rs.getString("STATE");
+                String phone = rs.getString("PHONE");
+                String fax = rs.getString("FAX");
+                String mail = rs.getString("EMAIL");
+                res.add(new ManufacturerEntity(id, name, city, state, phone, fax, mail));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+
+    public String getCustomerName(String mail) throws DAOException {
+        String res="";
+        String sql = "SELECT NAME FROM CUSTOMER WHERE EMAIL=?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setString(1, mail);
+            try(ResultSet r = stmt.executeQuery();){
+                if(r.next()){
+                   res=r.getString("NAME");
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
 }

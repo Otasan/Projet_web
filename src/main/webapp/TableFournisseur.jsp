@@ -1,3 +1,10 @@
+<%-- 
+    Document   : TableFournisseur
+    Created on : 10 avr. 2019, 20:49:59
+    Author     : Utilisateur
+--%>
+
+<%@page import="JDBC.ManufacturerEntity"%>
 <%@page import="java.util.List"%>
 <%@page import="JDBC.PurchaseOrder"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -13,7 +20,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link rel="icon" type="image/x-icon" href="https://geomatiqueagricole.ca/wp-content/uploads/2018/02/logo-ordinateur.png" />
-        <title>Page Commande</title>
+        <title>Page fournisseurs</title>
 
 
         <!-- Custom fonts for this template-->
@@ -44,7 +51,6 @@
                 <!-- Divider -->
                 <hr class="sidebar-divider my-0">
 
-
                 <li class="nav-item active">
                     <!--Retour vers commandes-->
                     <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
@@ -54,7 +60,6 @@
                         </button>
                     </form>
                 </li>
-
 
                 <!-- Divider -->
                 <hr class="sidebar-divider">
@@ -165,79 +170,54 @@
 
                         <!-- Page Heading -->
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">Ajout commande</h1>
+                            <h1 class="h3 mb-0 text-gray-800">Fournisseurs</h1>
                         </div>
 
-                        <p class="mb-4">Vous pouvez ajouter une nouvelle commande.<a target="_blank" href="https://datatables.net"></a></p>
+                        <p class="mb-4">Vous trouverez ci-dessous nos fournisseurs.<a target="_blank" href="https://datatables.net"></a></p>
 
                         <!-- DataTales Example -->
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Nouvelle commande</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Liste des fournisseurs</h6>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <form action="<c:url value="CommandeController"/>" method="POST">
-                                          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Identifiant Commande</th>
-                                                    <th>Article</th>
-                                                    <th>Quantité</th>
-                                                    <th>Prix TTC</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <%
-                                                        int id = (Integer)request.getAttribute("id");
-                                                        String valAffiche="";
-                                                        if(id>0){
-                                                        valAffiche=""+id;
-                                                        }
-                                                        else{
-                                                        valAffiche="Nouvelle Commande";
-                                                        }
-                                                        %>
-                                                        <%=valAffiche%>
-                                                        <input type="hidden" name="id" value="<%=id%>"/>
-                                                    </td>
-                                                    <td>
-                                                        <select name="produit">
-                                                            <%
-                                                            List<String> produits = (List)request.getAttribute("products");
-                                                                String sel = "";
-                                                                String selectedProd = (String)request.getAttribute("selected");
-                                                                for(String p:produits){
-                                                                if(selectedProd.equals(p)){
-                                                                sel="selected";
-                                                                }
-                                                                else{
-                                                                sel="";
-                                                                }
-                                                                %>
-                                                                <option value="<%=p%>" <%=sel%>><%=p%></option>
-                                                                <%}%>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <%
-                                                        int val = (Integer)request.getAttribute("quantite");
-                                                        %>
-                                                        <input type="number" name="quantite" min="1" value="<%=val%>"/>
-                                                    </td>
-                                                    <td>
-                                                        <%=request.getAttribute("prix")%>
-                                                        <!--Prix calculé à partir de la commande-->
-                                                    </td>
-                                                    <td>
-                                                        <button id="target" type="submit" name="action" value="valider">Valider la commande</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </form>
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Identifiant Fournisseur</th>
+                                                <th>Nom</th>
+                                                <th>Ville</th>
+                                                <th>Etat</th>
+                                                <th>E-mail</th>
+                                                <th>Téléphone</th>
+                                                <th>Fax</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%
+                                                List<ManufacturerEntity> fournisseurs = (List)request.getAttribute("manufaturers");
+                                                for(ManufacturerEntity m:fournisseurs){
+                                                    int id = m.getID();
+                                                    String name = m.getName();
+                                                    String city = m.getCity();
+                                                    String fax = m.getFax();
+                                                    String mail = m.getMail();
+                                                    String phone = m.getPhone();
+                                                    String state = m.getState();
+                                            %>
+                                            <tr>
+                                                <th><%=id%></th>
+                                                <td><%=name%></td>
+                                                <td><%=city%></td>
+                                                <td><%=state%></td>
+                                                <td><%=mail%></td>
+                                                <td><%=phone%></td>
+                                                <td><%=fax%></td>
+                                            </tr>
+                                            <%}%>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -299,16 +279,6 @@
 
             <!-- Custom scripts for all pages-->
             <script src="js/sb-admin-2.min.js"></script>
-            
-            <!-- mets à jour le prix automatiquement-->
-            <script   src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-            <script>
-                    $("input, select").change(function(){
-                        $("#target").attr("value", "updatePrix");
-                        $("#target").click();
-                    });
-            </script> 
 
-        </body>
-
+    </body>
 </html>

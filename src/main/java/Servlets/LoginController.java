@@ -66,7 +66,7 @@ public class LoginController extends HttpServlet {
                     String predictedMdp = ""+dao.identification(email);
                     if(mdp.equals(predictedMdp)){
                         jspView="UserOrders.jsp";
-                        request.setAttribute("Customer", mdp);
+                        request.setAttribute("user", dao.getCustomerName(email));
                         ajouterCommandes(mdp, request, dao);
                         HttpSession session = request.getSession(true); // démarre la session
 			session.setAttribute("email", email);
