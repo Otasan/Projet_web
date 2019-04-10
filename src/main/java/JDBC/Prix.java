@@ -25,7 +25,9 @@ public class Prix {
     }
     
     public float total(){
-        return purchasePrice*(1+markup/100)*(1-discountRate/100)*quantite+shippingCost;
+        float total = purchasePrice*(1+markup/100)*(1-discountRate/100)*quantite+shippingCost;
+        total = Math.round(total*100.0)/100;
+        return total;
     }
     
     public float getPurchasePrice(){

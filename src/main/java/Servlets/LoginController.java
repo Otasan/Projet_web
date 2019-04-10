@@ -36,14 +36,19 @@ public class LoginController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action");
-        switch(action){
-            case "login":
-                checkLogin(request, response);
-                break;
-            case "logout":
-                checkLogout(request, response);
-                break;
+        if(request.getParameter("action") == null){
+            request.getRequestDispatcher("Login.jsp").forward(request, response);
+        }
+        else{
+            String action = request.getParameter("action");
+            switch(action){
+                case "login":
+                    checkLogin(request, response);
+                    break;
+                case "logout":
+                    checkLogout(request, response);
+                    break;
+            }
         }
     }
     
