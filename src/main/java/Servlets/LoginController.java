@@ -62,30 +62,31 @@ public class LoginController extends HttpServlet {
     protected void checkLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String mdp = request.getParameter("mdp");
-        String jspView="";
-        if(email!=null&&mdp!=null){
-            if(email.equals("admin@admin.ad") && mdp.equals("1234")){
-                jspView="Connecte.jsp"; //TODO: Créer la page admin
-            }
-            else{
-                try{
-                    DAO dao = new DAO(DataSourceFactory.getDataSource());
-                    String predictedMdp = ""+dao.identification(email);
-                    if(mdp.equals(predictedMdp)){
-                        jspView="UserOrders.jsp";
+        System.out.println(email + mdp);
+        String jspView = "";
+        try {
+            DAO dao = new DAO(DataSourceFactory.getDataSource());
+            if (email != null && mdp != null) {
+                if (email.equals("admin@admin.ad") && mdp.equals("1234")) {
+                    affichageAdmin(request, dao);
+                    jspView = "PageAdmin.jsp"; //TODO: Créer la page admin
+                    HttpSession session = request.getSession(true); // démarre la session
+                    session.setAttribute("email", email);
+                } else {
+                    String predictedMdp = "" + dao.identification(email);
+                    if (mdp.equals(predictedMdp)) {
+                        jspView = "UserOrders.jsp";
                         request.setAttribute("user", dao.getCustomerName(email));
                         ajouterCommandes(mdp, request, dao);
                         HttpSession session = request.getSession(true); // démarre la session
-			session.setAttribute("email", email);
+                        session.setAttribute("email", email);
+                    } else {
+                        jspView = "Login.jsp";
                     }
-                    else{
-                        jspView="Login.jsp";
-                    }
-                }
-                catch(DAOException ex){
-                    System.out.println(ex);
                 }
             }
+        } catch (DAOException ex) {
+            jspView = "Login.jsp";
         }
         request.getRequestDispatcher(jspView).forward(request, response);
     }
@@ -156,6 +157,12 @@ public class LoginController extends HttpServlet {
     protected void ajouterCommandes(String mdp, HttpServletRequest request, DAO dao) throws DAOException{
         List mesCommandes = dao.getPurchaseOrderByClient(Integer.parseInt(mdp));
         request.setAttribute("orders", mesCommandes);
+    }
+    
+    protected void affichageAdmin(HttpServletRequest request, DAO dao) throws DAOException{
+        request.setAttribute("user", "Admin");
+        request.setAttribute("nbClients", dao.nbClients());
+        request.setAttribute("nbFournisseur", dao.nbFournisseurs());
     }
 }
 

@@ -549,4 +549,38 @@ public class DAO {
         }
         return res;
     }
+    
+    public int nbFournisseurs() throws DAOException{
+        int res=0;
+        String sql = "SELECT COUNT(*) AS NB FROM MANUFACTURER";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            if(rs.next()){
+                res = rs.getInt("NB");
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    public int nbClients() throws DAOException{
+        int res=0;
+        String sql = "SELECT COUNT(*) AS NB FROM CUSTOMER";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            if(rs.next()){
+                res = rs.getInt("NB");
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
 }
