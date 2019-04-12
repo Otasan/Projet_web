@@ -161,8 +161,11 @@ public class LoginController extends HttpServlet {
     
     protected void affichageAdmin(HttpServletRequest request, DAO dao) throws DAOException{
         request.setAttribute("user", "Admin");
+        request.setAttribute("CA", dao.chiffreDaffaire());
         request.setAttribute("nbClients", dao.nbClients());
+        request.setAttribute("articles", dao.typeArticle());
         request.setAttribute("nbFournisseur", dao.nbFournisseurs());
+        request.setAttribute("loca", dao.caParZip());
     }
 }
 

@@ -12,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -96,7 +98,7 @@ public class DAO {
      */
     public List<PurchaseOrder> getPurchaseOrderByClient (int id) throws DAOException{
         List<PurchaseOrder> res = new ArrayList();
-        String sql = "SELECT * FROM PURCHASE_ORDER INNER JOIN PRODUCT USING(PRODUCT_ID) WHERE CUSTOMER_ID = ?";
+        String sql = "SELECT * FROM PURCHASE_ORDER INNER JOIN PRODUCT USING(PRODUCT_ID) WHERE CUSTOMER_ID = ? ORDER BY ORDER_NUM ASC";
         try(Connection connexion = myDataSource.getConnection();
             PreparedStatement stmt = connexion.prepareStatement(sql);){
             stmt.setInt(1,id);
@@ -503,7 +505,7 @@ public class DAO {
      */
     public List<ManufacturerEntity> listeManufacturer() throws DAOException{
         ArrayList<ManufacturerEntity> res = new ArrayList();
-        String sql="SELECT * FROM MANUFACTURER";
+        String sql="SELECT * FROM MANUFACTURER ORDER BY MANUFACTURER_ID ASC";
         try(Connection connexion = myDataSource.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)){
@@ -575,6 +577,106 @@ public class DAO {
                 ResultSet rs = stmt.executeQuery(sql)){
             if(rs.next()){
                 res = rs.getInt("NB");
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+
+    public List<CustomerEntity> listCustomer() throws DAOException {
+        ArrayList<CustomerEntity> res = new ArrayList();
+        String sql="SELECT * FROM CUSTOMER ORDER BY CUSTOMER_ID ASC";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                int id = rs.getInt("CUSTOMER_ID");
+                String name = rs.getString("NAME");
+                String mail = rs.getString("EMAIL");
+                String city = rs.getString("CITY");
+                String state = rs.getString("STATE");
+                String fax = rs.getString("FAX");
+                String phone = rs.getString("PHONE");
+                res.add(new CustomerEntity(id,name,mail,city,state,phone,fax));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    public float chiffreDaffaire() throws DAOException{
+        float res = 0;
+        ArrayList<Prix> lesPrix = new ArrayList();
+        String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                Prix p = getPrix(rs.getInt("ORDER_NUM"));
+                res += p.gains();
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    } 
+    
+    public List<String> typeArticle() throws DAOException{
+        ArrayList<String> res = new ArrayList();
+        String sql="SELECT DESCRIPTION FROM PRODUCT_CODE ORDER BY DESCRIPTION ASC";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                res.add(rs.getString("DESCRIPTION"));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+
+    public float caPourZip(int zip) throws DAOException{
+        float res = 0;
+        String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER "
+                + "INNER JOIN CUSTOMER USING (CUSTOMER_ID) "
+                + "WHERE CUSTOMER.ZIP = ?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, zip);
+            try(ResultSet r = stmt.executeQuery();){
+                while(r.next()){
+                   Prix p =getPrix(r.getInt("ORDER_NUM"));
+                   res += p.gains();
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    public Map<Integer,Float> caParZip() throws DAOException {
+        HashMap<Integer, Float> res = new HashMap();
+        String sql = "SELECT ZIP_CODE FROM MICRO_MARKET";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                int zip = rs.getInt("ZIP_CODE");
+                res.put(zip, caPourZip(zip));
             }
         }
         catch(SQLException ex){

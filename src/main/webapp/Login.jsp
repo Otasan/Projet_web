@@ -22,7 +22,7 @@
                 <div class="h4">Identification</div>
 
                 <!-- Email -->
-                <input type="email" id="defaultLoginFormEmail" class="form-control mb-4" placeholder="Nom d'utilisateur" name="email">
+                <input type="text" id="defaultLoginFormEmail" class="form-control mb-4" placeholder="Nom d'utilisateur" name="email">
 
                 <!-- Password -->
                 <input type="password" id="defaultLoginFormPassword" class="form-control mb-4" placeholder="Mot de passe" name="mdp">

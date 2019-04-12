@@ -3,6 +3,9 @@
     Created on : 11 avr. 2019, 14:56:08
     Author     : Utilisateur
 --%>
+<%@page import="java.util.Set"%>
+<%@page import="java.util.Map"%>
+<%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -26,6 +29,11 @@
         <!-- Custom styles for this template-->
         <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
+        <!--script carte-->
+        <script src="vendor/jquery/jquery.min.js"></script>
+        <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+        <script type="text/javascript" src="js/graphs.js"></script>
+
     </head>
 
     <body id="page-top">
@@ -47,9 +55,13 @@
                 <!-- Divider -->
                 <hr class="sidebar-divider my-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="blank.html">
-                        <i class="fas fa-fw fa-tachometer-alt"></i>
-                        <span>Dashboard</span></a>
+                    <!--retour au Dashboard-->
+                    <form id="form-commande" action="<c:url value="AdminController"/>" method="POST">
+                        <button type="submit" name="action" value="afficherAdmin" class="nav-link bg-primary" >
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            Dashboard
+                        </button>
+                    </form>
                 </li>
 
 
@@ -58,9 +70,13 @@
 
                 <!-- Nav Item - Tables -->
                 <li class="nav-item">
-                    <a class="nav-link" href="tableclientadmin.html">
-                        <i class="fas fa-fw fa-table"></i>
-                        <span>Liste des clients</span></a>
+                    <!--liste des clients-->
+                    <form id="form-commande" action="<c:url value="AdminController"/>" method="POST">
+                        <button type="submit" name="action" value="clients" class="nav-link bg-primary" >
+                            <i class="fas fa-fw fa-table"></i>
+                            Liste des Clients
+                        </button>
+                    </form>
                 </li>
                 <!-- Nav Item - Tables -->
                 <li class="nav-item">
@@ -161,7 +177,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Chiffre d'affaires</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">40,000€</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800"><%= request.getAttribute("CA")%>€</div>
                                             </div>
                                             <div class="col-auto">
                                                 <i class="fas fa-euro-sign fa-2x text-gray-300"></i>
@@ -206,167 +222,141 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row card shadow mb-4">
+                            <!-- Card Header - Accordion --><!-- Card Header - Accordion -->
+                            <!-- CA/article-->
+                            <a href="#collapseCardCAArticle" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par catégorie d'article, en choisissant la période</h6>
+                            </a>
+                            <!-- Card Content - Collapse -->
+                            <div class="collapse show" id="collapseCardCAArticle">
+                                <form class="card-body" action="<c:url value="AdminController"/>" method="POST">
 
-                        <div class="row">
+                                    <label for="start">Entrer la date de début de période:</label>
 
-                            <div class="col-lg-6">
+                                    <input type="date" id="start-ca-article" name="trip-start">
+                                    <label for="start">Entrer la date de fin de période:</label>
 
-                                <!-- Collapsable Card Example -->
-                                <div class="card shadow mb-4">
-                                    <!-- Card Header - Accordion -->
-                                    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                        <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par catégorie d'article, en choisissant la période</h6>
-                                    </a>
-                                    <!-- Card Content - Collapse -->
-                                    <div class="collapse show" id="collapseCardExample">
-                                        <div class="card-body">
-
-                                            <label for="start">Entrer la date de début de période:</label>
-
-                                            <input type="date" id="start" name="trip-start">
-                                            <label for="start">Entrer la date de fin de période:</label>
-
-                                            <input type="date" id="start" name="trip-start">
-                                            <div class="dropdown">
-                                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                    Catégorie d'article
-                                                    <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                                    <li><a href="#" title="Lien 1">Lien 1</a></li>
-                                                    <li><a href="#" title="Lien 2">Lien 2</a></li>
-                                                    <li><a href="#" title="Lien 3">Lien 3</a></li>
-                                                    <li role="separator" class="divider"></li>
-                                                    <li><a href="#" title="Lien 4">Lien 4</a></li>
-                                                </ul>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="card shadow mb-4">
-                                        <!-- Card Header - Accordion -->
-                                        <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                            <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par zone géographique, en choisissant la période</h6>
-                                        </a>
-                                        <!-- Card Content - Collapse -->
-                                        <div class="collapse show" id="collapseCardExample">
-                                            <div class="card-body">
-                                                <label for="start">Entrer la date de début de période:</label>
-
-                                                <input type="date" id="start" name="trip-start">
-                                                <label for="start">Entrer la date de fin de période:</label>
-
-                                                <input type="date" id="start" name="trip-start">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                        Zone géographique
-                                                        <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                                        <li><a href="#" title="Lien 1">Lien 1</a></li>
-                                                        <li><a href="#" title="Lien 2">Lien 2</a></li>
-                                                        <li><a href="#" title="Lien 3">Lien 3</a></li>
-                                                        <li role="separator" class="divider"></li>
-                                                        <li><a href="#" title="Lien 4">Lien 4</a></li>
-                                                    </ul>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <div class="card shadow mb-4">
-                                            <!-- Card Header - Accordion -->
-                                            <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par client, en choisissant la période</h6>
-                                            </a>
-                                            <!-- Card Content - Collapse -->
-                                            <div class="collapse show" id="collapseCardExample">
-                                                <div class="card-body">
-                                                    <label for="start">Entrer la date de début de période:</label>
-
-                                                    <input type="date" id="start" name="trip-start">
-                                                    <label for="start">Entrer la date de fin de période:</label>
-
-                                                    <input type="date" id="start" name="trip-start">
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                            Client
-                                                            <span class="caret"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                                            <li><a href="#" title="Lien 1">Lien 1</a></li>
-                                                            <li><a href="#" title="Lien 2">Lien 2</a></li>
-                                                            <li><a href="#" title="Lien 3">Lien 3</a></li>
-                                                            <li role="separator" class="divider"></li>
-                                                            <li><a href="#" title="Lien 4">Lien 4</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                    <input type="date" id="ent-ca-article" name="trip-start">
+                                    <div class="dropdown">
+                                        <select class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <option selected="true">Catégorie d'article</option>
+                                            <%
+                                                List<String> articles = (List) request.getAttribute("articles");
+                                                for (String s : articles) {
+                                            %>
+                                            <option value="<%=s%>"><%=s%></option>
+                                            <%}%>
+                                        </select>
                                     </div>
 
-                                </div>
+                                </form>
+                            </div>
+                            <a href="#collapseCardZoneGeo" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par zone géographique, en choisissant la période</h6>
+                            </a>
+                            <!-- Card Content - Collapse -->
+                            <div class="collapse show" id="collapseCardZoneGeo">
+                                <form class="card-body" action="<c:url value="AdminController"/>" method="POST">
+                                    <label for="start">Entrer la date de début de période:</label>
 
+                                    <input type="date" id="start-zone-geo" name="trip-start">
+                                    <label for="start">Entrer la date de fin de période:</label>
+
+                                    <input type="date" id="end-zone-geo" name="trip-start">
+                                    <div class="dropdown" id="input-carte">
+                                        <%
+                                            Map<Integer, Float> zip = (Map) request.getAttribute("loca");
+                                            Set<Integer> d = zip.keySet();
+                                            for (int z : d) {
+                                        %>
+                                        <input type="hidden" class="input-carte" id="<%=z%>" value="<%=zip.get(z)%>"/>
+                                        <%}%>
+                                        <div id="carte_affichage" ></div>
+                                    </div>
+
+                                </form>
+                            </div>
+                            <a href="#collapseCardTemps" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par client, en choisissant la période</h6>
+                            </a>
+                            <!-- Card Content - Collapse -->
+                            <div class="collapse show" id="collapseCardTemps">
+                                <form class="card-body" action="<c:url value="AdminController"/>" method="POST">
+                                    <label for="start">Entrer la date de début de période:</label>
+
+                                    <input type="date" id="start-client" name="trip-start">
+                                    <label for="start">Entrer la date de fin de période:</label>
+
+                                    <input type="date" id="end-client" name="trip-start">
+                                    <div class="dropdown">
+                                        <select class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <option selected="true">Client</option>
+                                        </select>
+                                    </div>
+                                </form>
                             </div>
 
 
-                            <!-- End of Main Content -->
-
-                            <!-- Footer -->
-                            <footer class="sticky-footer bg-white">
-                                <div class="container my-auto">
-                                    <div class="copyright text-center my-auto">
-                                        <span>Copyright &copy; Abdo, Numa, Rezig</span>
-                                    </div>
-                                </div>
-                            </footer>
-                            <!-- End of Footer -->
 
                         </div>
-                        <!-- End of Content Wrapper -->
 
+
+                        <!-- End of Main Content -->
+
+                        <!-- Footer -->
+                        <footer class="sticky-footer bg-white">
+                            <div class="container my-auto">
+                                <div class="copyright text-center my-auto">
+                                    <span>Copyright &copy; Abdo, Numa, Rezig</span>
+                                </div>
+                            </div>
+                        </footer>
+                        <!-- End of Footer -->
                     </div>
-                    <!-- End of Page Wrapper -->
+                </div>
+            </div>
+            <!-- End of Content Wrapper -->
 
-                    <!-- Scroll to Top Button-->
-                    <a class="scroll-to-top rounded" href="#page-top">
-                        <i class="fas fa-angle-up"></i>
-                    </a>
+        </div>
+        <!-- End of Page Wrapper -->
 
-                    <!-- Logout Modal-->
-                    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                    <form action="<c:url value="LoginController"/>"  method="POST">
-                                        <button class="btn btn-secondary bg-primary" type="submit" name="action" value="logout">Logout</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fas fa-angle-up"></i>
+        </a>
+
+        <!-- Logout Modal-->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <form action="<c:url value="LoginController"/>"  method="POST">
+                            <button class="btn btn-secondary bg-primary" type="submit" name="action" value="logout">Logout</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Bootstrap core JavaScript-->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    </div>
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-        <!-- Core plugin JavaScript-->
-        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-        <!-- Custom scripts for all pages-->
-        <script src="js/sb-admin-2.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
 
-    </body>
+</body>
 
 </html>

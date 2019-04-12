@@ -5,11 +5,14 @@
  */
 package Servlets;
 
+import JDBC.CustomerEntity;
 import JDBC.DAO;
 import JDBC.DAOException;
 import JDBC.DataSourceFactory;
+import JDBC.ManufacturerEntity;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -49,7 +52,10 @@ public class AdminController extends HttpServlet {
                         affichageAdmin(request, response, dao);
                         break;
                     case "fournisseurs":
-                        request.getRequestDispatcher("Tableournisseur.jsp").forward(request, response);
+                        listeManufacturer(request, response, dao);
+                        break;
+                    case "clients":
+                        listeClient(request, response, dao);
                         break;
                         
                 }
@@ -70,9 +76,11 @@ public class AdminController extends HttpServlet {
     
     protected void affichageAdmin(HttpServletRequest request, HttpServletResponse response, DAO dao) throws DAOException, ServletException, IOException{
         request.setAttribute("user", "admin");
+        request.setAttribute("CA", dao.chiffreDaffaire());
+        request.setAttribute("articles", dao.typeArticle());
         request.setAttribute("nbClients", dao.nbClients());
         request.setAttribute("nbFournisseur", dao.nbFournisseurs());
-        request.getRequestDispatcher("AdminPage.jsp").forward(request, response);
+        request.getRequestDispatcher("PageAdmin.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -113,5 +121,26 @@ public class AdminController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    /**
+     * affiche la page TableFournisseur.jsp pour l'utilisateur connecté
+     * @param request
+     * @param response
+     * @param dao
+     * @throws DAOException
+     * @throws ServletException
+     * @throws IOException 
+     */
+    private void listeManufacturer(HttpServletRequest request, HttpServletResponse response, DAO dao) throws DAOException, ServletException, IOException {
+        List<ManufacturerEntity> manufaturers = dao.listeManufacturer();
+        request.setAttribute("manufaturers", manufaturers);
+        request.getRequestDispatcher("TableFournisseurAdmin.jsp").forward(request, response);
+    }
+
+    private void listeClient(HttpServletRequest request, HttpServletResponse response, DAO dao) throws ServletException, IOException, DAOException {
+        List<CustomerEntity> clients = dao.listCustomer();
+        request.setAttribute("clients", clients);
+        request.getRequestDispatcher("TableClient.jsp").forward(request, response);
+    }
 
 }

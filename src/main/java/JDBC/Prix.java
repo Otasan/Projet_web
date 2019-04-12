@@ -30,6 +30,12 @@ public class Prix {
         return total;
     }
     
+    public float gains(){
+        float gain =(purchasePrice*(1+markup/100) - purchasePrice*(1-discountRate/100))*quantite;
+        gain = (float) (Math.round(gain*100.0)/100.0);
+        return gain;
+    }
+    
     public float getPurchasePrice(){
         return purchasePrice;
     }
