@@ -62,7 +62,6 @@ public class LoginController extends HttpServlet {
     protected void checkLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String mdp = request.getParameter("mdp");
-        System.out.println(email + mdp);
         String jspView = "";
         try {
             DAO dao = new DAO(DataSourceFactory.getDataSource());
@@ -166,6 +165,7 @@ public class LoginController extends HttpServlet {
         request.setAttribute("articles", dao.typeArticle());
         request.setAttribute("nbFournisseur", dao.nbFournisseurs());
         request.setAttribute("loca", dao.caParZip());
+        request.setAttribute("prod", dao.caParTypeProduit());
     }
 }
 

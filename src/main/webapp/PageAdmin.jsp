@@ -238,16 +238,15 @@
                                     <label for="start">Entrer la date de fin de période:</label>
 
                                     <input type="date" id="ent-ca-article" name="trip-start">
-                                    <div class="dropdown">
-                                        <select class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            <option selected="true">Catégorie d'article</option>
-                                            <%
-                                                List<String> articles = (List) request.getAttribute("articles");
-                                                for (String s : articles) {
-                                            %>
-                                            <option value="<%=s%>"><%=s%></option>
-                                            <%}%>
-                                        </select>
+                                    <div class="dropdown" id='input-pie'>
+                                        <%
+                                            Map<String,Float> prod = (Map) request.getAttribute("prod");
+                                            Set<String> types = prod.keySet();
+                                            for(String t:types){
+                                        %>
+                                        <input type="hidden" class="input-pie" id="<%=t%>" value="<%=prod.get(t)%>"/>
+                                        <%}%>
+                                        <div id="pie_affichage" ></div>
                                     </div>
 
                                 </form>
@@ -272,6 +271,7 @@
                                         %>
                                         <input type="hidden" class="input-carte" id="<%=z%>" value="<%=zip.get(z)%>"/>
                                         <%}%>
+                                        <input type="hidden" value="<%= request.getAttribute("CA")%>" id="chiffreAffaire"/>
                                         <div id="carte_affichage" ></div>
                                     </div>
 

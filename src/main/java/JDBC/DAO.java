@@ -685,4 +685,44 @@ public class DAO {
         }
         return res;
     }
+    
+    public Float caPourTypeProduit(String prodCode) throws DAOException{
+        float res =0;
+        String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER "
+                + "INNER JOIN PRODUCT USING (PRODUCT_ID) "
+                + "WHERE PRODUCT_CODE LIKE ?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setString(1, prodCode);
+            try(ResultSet r = stmt.executeQuery();){
+                while(r.next()){
+                   Prix p =getPrix(r.getInt("ORDER_NUM"));
+                   res += p.gains();
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    public Map<String,Float> caParTypeProduit() throws DAOException{
+        HashMap<String, Float> res=new HashMap();
+        String sql = "SELECT PROD_CODE, DESCRIPTION FROM PRODUCT_CODE";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                String desc = rs.getString("DESCRIPTION");
+                res.put(desc, caPourTypeProduit(rs.getString("PROD_CODE")));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
 }
