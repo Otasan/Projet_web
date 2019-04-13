@@ -487,7 +487,7 @@ public class DAO {
                 int id = rs.getInt("PRODUCT_ID");
                 String manu = rs.getString("NAME");
                 String code = rs.getString("PRODUCT_CODE");
-                float cost = rs.getFloat("PURCHASE_COST");
+                float cost = rs.getFloat("PURCHASE_COST")*(1+rs.getFloat("MARKUP")/100);
                 String nom = rs.getString("DESCRIPTION");
                 res.add(new ProductEntity(id, manu, code, cost, nom));
             }
