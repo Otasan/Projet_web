@@ -41,10 +41,8 @@
 
                 <!-- Sidebar - Brand -->
                 <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-                    <div class="sidebar-brand-icon rotate-n-15">
-                        <i class="fas fa-laugh-wink"></i>
-                    </div>
-                    <div class="sidebar-brand-text mx-3">Accueil</div>
+                        <i class="fas fa-fw fa-table"></i>
+                    <div class="sidebar-brand-text mx-3">Fournisseurs</div>
                 </a>
 
                 <!-- Divider -->
@@ -54,7 +52,7 @@
                 <li class="nav-item active">
                     <!--retour au Dashboard-->
                     <form id="form-commande" action="<c:url value="AdminController"/>" method="POST">
-                        <button type="submit" name="action" value="afficherAdmin" class="nav-link bg-primary" >
+                        <button type="submit" name="action" value="afficherAdmin" class="btn btn-primary btn-lg" >
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             Dashboard
                         </button>
@@ -69,7 +67,7 @@
                 <li class="nav-item">
                     <!--liste des clients-->
                     <form id="form-commande" action="<c:url value="AdminController"/>" method="POST">
-                        <button type="submit" name="action" value="clients" class="nav-link bg-primary" >
+                        <button type="submit" name="action" value="clients" class="btn btn-primary btn-lg" >
                             <i class="fas fa-fw fa-table"></i>
                             Liste des Clients
                         </button>
@@ -79,7 +77,7 @@
                 <li class="nav-item">
                     <!--liste des fournisseurs-->
                     <form id="form-commande" action="<c:url value="AdminController"/>" method="POST">
-                        <button type="submit" name="action" value="fournisseurs" class="nav-link bg-primary" >
+                        <button type="submit" name="action" value="fournisseurs" class="btn btn-primary btn-lg" >
                             <i class="fas fa-fw fa-table"></i>
                             Liste des fournisseurs
                         </button>

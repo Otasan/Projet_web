@@ -1,4 +1,4 @@
-<%-- 
+Sélectionnez "Déconnexion" si vous souhaitez fermer la session active.<%-- 
     Document   : UserOrders
     Created on : 5 avr. 2019, 10:07:45
     Author     : roxan
@@ -42,9 +42,7 @@
 
                 <!-- Sidebar - Brand -->
                 <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-                    <div class="sidebar-brand-icon rotate-n-15">
-                        <i class="fas fa-laugh-wink"></i>
-                    </div>
+                        <i class="far fa-compass"></i>
                     <div class="sidebar-brand-text mx-3">Accueil</div>
                 </a>
 
@@ -54,7 +52,7 @@
                 <li class="nav-item active">
                     <!--Retour vers commandes-->
                     <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
-                        <button type="submit" name="action" value="afficher" class="nav-link bg-primary" >
+                        <button type="submit" name="action" value="afficher" class="btn btn-primary btn-lg" >
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             Profil
                         </button>
@@ -68,7 +66,7 @@
                 <li class="nav-item">
                     <!--liste des fournisseurs-->
                     <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
-                        <button type="submit" name="action" value="fournisseurs" class="nav-link bg-primary" >
+                        <button type="submit" name="action" value="fournisseurs" class="btn btn-primary btn-lg" >
                             <i class="fas fa-fw fa-table"></i>
                             Liste des fournisseurs
                         </button>
@@ -78,7 +76,7 @@
                 <li class="nav-item">
                     <!--Liste produits-->
                     <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
-                        <button type="submit" name="action" value="products" class="nav-link bg-primary" >
+                        <button type="submit" name="action" value="products" class="btn btn-primary btn-lg" >
                             <i class="fas fa-fw fa-table"></i>
                             Liste des produits
                         </button>
@@ -88,8 +86,8 @@
                 <li class="nav-item">
                     <!--Nouvelle commande-->
                     <form id="form-commande" action="<c:url value="CommandeController"/>" method="POST">
-                        <button type="submit" name="action" value="new" class="nav-link bg-primary" >
-                            <i class="fas fa-fw fa-cog"></i>
+                        <button type="submit" name="action" value="new" class="btn btn-primary btn-lg" >
+                            <i class="fas fa-plus-circle"></i>
                             Nouvelle commande
                         </button>
                     </form>
