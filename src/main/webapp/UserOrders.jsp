@@ -1,4 +1,4 @@
-Sélectionnez "Déconnexion" si vous souhaitez fermer la session active.<%-- 
+<%-- 
     Document   : UserOrders
     Created on : 5 avr. 2019, 10:07:45
     Author     : roxan
