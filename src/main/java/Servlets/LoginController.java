@@ -10,7 +10,12 @@ import JDBC.DAOException;
 import JDBC.DataSourceFactory;
 import Listener.UtilisateursConnectes;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -158,14 +163,33 @@ public class LoginController extends HttpServlet {
         request.setAttribute("orders", mesCommandes);
     }
     
+    /**
+     * Permet le premier affichage de la page administrateur
+     * @param request
+     * @param dao
+     * @throws DAOException 
+     */
     protected void affichageAdmin(HttpServletRequest request, DAO dao) throws DAOException{
+        SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+        Date d = new Date();
+        request.setAttribute("start-ca-article", dao.preDate);
+        request.setAttribute("end-ca-article", df.format(d));
+        request.setAttribute("start-zone-geo", dao.preDate);
+        request.setAttribute("end-zone-geo", df.format(d));
+        request.setAttribute("start-client", dao.preDate);
+        request.setAttribute("end-client", df.format(d));
         request.setAttribute("user", "Admin");
         request.setAttribute("CA", dao.chiffreDaffaire());
         request.setAttribute("nbClients", dao.nbClients());
         request.setAttribute("articles", dao.typeArticle());
         request.setAttribute("nbFournisseur", dao.nbFournisseurs());
-        request.setAttribute("loca", dao.caParZip());
-        request.setAttribute("prod", dao.caParTypeProduit());
+        try {
+            request.setAttribute("loca", dao.caParZipPourPeriode(df.parse(dao.preDate),d));
+            request.setAttribute("prod", dao.caParTypeProduitPourPeriode(df.parse(dao.preDate),d));
+            request.setAttribute("cli", dao.caParClientPourPeriode(df.parse(dao.preDate),d));
+        } catch (ParseException ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
 

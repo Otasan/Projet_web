@@ -45,7 +45,7 @@
             <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
                 <!-- Sidebar - Brand -->
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="blank.html">
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                     <div class="sidebar-brand-icon rotate-n-15">
                         <i class="fas fa-laugh-wink"></i>
                     </div>
@@ -178,6 +178,7 @@
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Chiffre d'affaires</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800"><%= request.getAttribute("CA")%>€</div>
+                                                <input type="hidden" value="<%= request.getAttribute("CA")%>" id="chiffreAffaire"/>
                                             </div>
                                             <div class="col-auto">
                                                 <i class="fas fa-euro-sign fa-2x text-gray-300"></i>
@@ -222,47 +223,57 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row card shadow mb-4">
-                            <!-- Card Header - Accordion --><!-- Card Header - Accordion -->
-                            <!-- CA/article-->
-                            <a href="#collapseCardCAArticle" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par catégorie d'article, en choisissant la période</h6>
-                            </a>
-                            <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardCAArticle">
-                                <form class="card-body" action="<c:url value="AdminController"/>" method="POST">
-
-                                    <label for="start">Entrer la date de début de période:</label>
-
-                                    <input type="date" id="start-ca-article" name="trip-start">
-                                    <label for="start">Entrer la date de fin de période:</label>
-
-                                    <input type="date" id="ent-ca-article" name="trip-start">
+                        <form action="<c:url value="AdminController"/>" method="POST">
+                            <div class="row card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <!-- CA/article-->
+                                <a href="#collapseCardCAArticle" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par catégorie d'article, en choisissant la période</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" class="card-body" id="collapseCardCAArticle">
+                                    <ul>
+                                        <li>
+                                            <label for="start">Entrer la date de début de période:</label>
+                                            <input type="date" id="start-ca-article" name="start-ca-article" value="<%=(String) request.getAttribute("start-ca-article")%>"/>
+                                        </li>
+                                        <li>
+                                            <label for="start">Entrer la date de fin de période:</label>
+                                            <input type="date" id="end-ca-article" name="end-ca-article" value="<%=(String) request.getAttribute("end-ca-article")%>"/>
+                                        </li>
+                                        <li>
+                                            <button type="submit" name="action" value="updateDate">Valider</button>
+                                        </li>
+                                    </ul>
                                     <div class="dropdown" id='input-pie'>
                                         <%
-                                            Map<String,Float> prod = (Map) request.getAttribute("prod");
+                                            Map<String, Float> prod = (Map) request.getAttribute("prod");
                                             Set<String> types = prod.keySet();
-                                            for(String t:types){
+                                            for (String t : types) {
                                         %>
                                         <input type="hidden" class="input-pie" id="<%=t%>" value="<%=prod.get(t)%>"/>
                                         <%}%>
                                         <div id="pie_affichage" ></div>
                                     </div>
-
-                                </form>
-                            </div>
-                            <a href="#collapseCardZoneGeo" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par zone géographique, en choisissant la période</h6>
-                            </a>
-                            <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardZoneGeo">
-                                <form class="card-body" action="<c:url value="AdminController"/>" method="POST">
-                                    <label for="start">Entrer la date de début de période:</label>
-
-                                    <input type="date" id="start-zone-geo" name="trip-start">
-                                    <label for="start">Entrer la date de fin de période:</label>
-
-                                    <input type="date" id="end-zone-geo" name="trip-start">
+                                </div>
+                                <a href="#collapseCardZoneGeo" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par zone géographique, en choisissant la période</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" class="card-body" id="collapseCardZoneGeo">
+                                    <ul>
+                                        <li>
+                                            <label for="start">Entrer la date de début de période:</label>
+                                            <input type="date" id="start-zone-geo" name="start-zone-geo" value="<%=(String) request.getAttribute("start-zone-geo")%>">
+                                        </li>
+                                        <li>
+                                            <label for="start">Entrer la date de fin de période:</label>
+                                            <input type="date" id="end-zone-geo" name="end-zone-geo" value="<%=(String) request.getAttribute("end-zone-geo")%>">
+                                        </li>
+                                        <li>
+                                            <button type="submit" name="action" value="updateDate">Valider</button>
+                                        </li>
+                                    </ul>
                                     <div class="dropdown" id="input-carte">
                                         <%
                                             Map<Integer, Float> zip = (Map) request.getAttribute("loca");
@@ -271,35 +282,42 @@
                                         %>
                                         <input type="hidden" class="input-carte" id="<%=z%>" value="<%=zip.get(z)%>"/>
                                         <%}%>
-                                        <input type="hidden" value="<%= request.getAttribute("CA")%>" id="chiffreAffaire"/>
                                         <div id="carte_affichage" ></div>
                                     </div>
-
-                                </form>
-                            </div>
-                            <a href="#collapseCardTemps" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par client, en choisissant la période</h6>
-                            </a>
-                            <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardTemps">
-                                <form class="card-body" action="<c:url value="AdminController"/>" method="POST">
-                                    <label for="start">Entrer la date de début de période:</label>
-
-                                    <input type="date" id="start-client" name="trip-start">
-                                    <label for="start">Entrer la date de fin de période:</label>
-
-                                    <input type="date" id="end-client" name="trip-start">
-                                    <div class="dropdown">
-                                        <select class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            <option selected="true">Client</option>
-                                        </select>
+                                </div>
+                                <a href="#collapseCardTemps" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">Chiffres d'affaire par client, en choisissant la période</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" class="card-body" id="collapseCardTemps">
+                                    <ul>
+                                        <li>
+                                            <label for="start">Entrer la date de début de période:</label>
+                                            <input type="date" id="start-client" name="start-client" value="<%=(String) request.getAttribute("start-client")%>">
+                                        </li>
+                                        <li>
+                                            <label for="start">Entrer la date de fin de période:</label>
+                                            <input type="date" id="end-client" name="end-client" value="<%=(String) request.getAttribute("end-client")%>">
+                                        </li>
+                                        <li>
+                                            <button type="submit" name="action" value="updateDate">Valider</button>
+                                        </li>
+                                    </ul>
+                                    <div class="dropdown" id="input-bar">
+                                        <%
+                                            Map<String, Float> client = (Map) request.getAttribute("cli");
+                                            Set<String> cu = client.keySet();
+                                            for (String c : cu) {
+                                        %>
+                                        <input type="hidden" class="input-bar" id="<%=c%>" value="<%=client.get(c)%>"/>
+                                        <%}%>
+                                        <div id="bar_affichage"></div>
                                     </div>
-                                </form>
+                                </div>
+
+
                             </div>
-
-
-
-                        </div>
+                        </form>
 
 
                         <!-- End of Main Content -->

@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 public class DAO {
 
     protected final DataSource myDataSource;
+    public final String preDate = "2011-05-24";
 
     /**
      *
@@ -552,6 +553,11 @@ public class DAO {
         return res;
     }
     
+    /**
+     * 
+     * @return nombre de fournisseurs
+     * @throws DAOException 
+     */
     public int nbFournisseurs() throws DAOException{
         int res=0;
         String sql = "SELECT COUNT(*) AS NB FROM MANUFACTURER";
@@ -569,6 +575,11 @@ public class DAO {
         return res;
     }
     
+    /**
+     * 
+     * @return nombre de clients
+     * @throws DAOException 
+     */
     public int nbClients() throws DAOException{
         int res=0;
         String sql = "SELECT COUNT(*) AS NB FROM CUSTOMER";
@@ -586,6 +597,11 @@ public class DAO {
         return res;
     }
 
+    /**
+     * 
+     * @return Liste de tout les customers
+     * @throws DAOException 
+     */
     public List<CustomerEntity> listCustomer() throws DAOException {
         ArrayList<CustomerEntity> res = new ArrayList();
         String sql="SELECT * FROM CUSTOMER ORDER BY CUSTOMER_ID ASC";
@@ -610,6 +626,11 @@ public class DAO {
         return res;
     }
     
+    /**
+     * 
+     * @return chiffre d'affaire total
+     * @throws DAOException 
+     */
     public float chiffreDaffaire() throws DAOException{
         float res = 0;
         ArrayList<Prix> lesPrix = new ArrayList();
@@ -629,6 +650,11 @@ public class DAO {
         return res;
     } 
     
+    /**
+     * 
+     * @return liste de tout les types d'articles
+     * @throws DAOException 
+     */
     public List<String> typeArticle() throws DAOException{
         ArrayList<String> res = new ArrayList();
         String sql="SELECT DESCRIPTION FROM PRODUCT_CODE ORDER BY DESCRIPTION ASC";
@@ -646,14 +672,25 @@ public class DAO {
         return res;
     }
 
-    public float caPourZip(int zip) throws DAOException{
+    /**
+     * 
+     * @param zip
+     * @param debut
+     * @param fin
+     * @return le chiffre d'affaire pour un marché
+     * @throws DAOException 
+     */
+    public float caPourZip(int zip, Date debut, Date fin) throws DAOException{
         float res = 0;
         String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER "
                 + "INNER JOIN CUSTOMER USING (CUSTOMER_ID) "
-                + "WHERE CUSTOMER.ZIP = ?";
+                + "WHERE CUSTOMER.ZIP = ? AND "
+                + "SALES_DATE BETWEEN ? AND ?";
         try(Connection connexion = myDataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(sql);){
             stmt.setInt(1, zip);
+            stmt.setDate(2, debut);
+            stmt.setDate(3, fin);
             try(ResultSet r = stmt.executeQuery();){
                 while(r.next()){
                    Prix p =getPrix(r.getInt("ORDER_NUM"));
@@ -668,7 +705,14 @@ public class DAO {
         return res;
     }
     
-    public Map<Integer,Float> caParZip() throws DAOException {
+    /**
+     * 
+     * @param debut
+     * @param fin
+     * @return le chiffre d'affaire de chaque zone géographique
+     * @throws DAOException 
+     */
+    public Map<Integer,Float> caParZipPourPeriode(java.util.Date debut, java.util.Date fin) throws DAOException {
         HashMap<Integer, Float> res = new HashMap();
         String sql = "SELECT ZIP_CODE FROM MICRO_MARKET";
         try(Connection connexion = myDataSource.getConnection();
@@ -676,7 +720,7 @@ public class DAO {
                 ResultSet rs = stmt.executeQuery(sql)){
             while(rs.next()){
                 int zip = rs.getInt("ZIP_CODE");
-                res.put(zip, caPourZip(zip));
+                res.put(zip, caPourZip(zip, new Date(debut.getTime()), new Date(fin.getTime())));
             }
         }
         catch(SQLException ex){
@@ -686,14 +730,25 @@ public class DAO {
         return res;
     }
     
-    public Float caPourTypeProduit(String prodCode) throws DAOException{
+    /**
+     * 
+     * @param prodCode
+     * @param debut
+     * @param fin
+     * @return le chiffre d'affaires pour un type de produit
+     * @throws DAOException 
+     */
+    public Float caPourTypeProduit(String prodCode, Date debut, Date fin) throws DAOException{
         float res =0;
         String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER "
                 + "INNER JOIN PRODUCT USING (PRODUCT_ID) "
-                + "WHERE PRODUCT_CODE LIKE ?";
+                + "WHERE PRODUCT_CODE LIKE ? AND "
+                + "SALES_DATE BETWEEN ? AND ?";
         try(Connection connexion = myDataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(sql);){
             stmt.setString(1, prodCode);
+            stmt.setDate(2, debut);
+            stmt.setDate(3, fin);
             try(ResultSet r = stmt.executeQuery();){
                 while(r.next()){
                    Prix p =getPrix(r.getInt("ORDER_NUM"));
@@ -708,7 +763,14 @@ public class DAO {
         return res;
     }
     
-    public Map<String,Float> caParTypeProduit() throws DAOException{
+    /**
+     * 
+     * @param debut
+     * @param fin
+     * @return le chiffre d'affaire de chaque produit
+     * @throws DAOException 
+     */
+    public Map<String,Float> caParTypeProduitPourPeriode(java.util.Date debut, java.util.Date fin) throws DAOException{
         HashMap<String, Float> res=new HashMap();
         String sql = "SELECT PROD_CODE, DESCRIPTION FROM PRODUCT_CODE";
         try(Connection connexion = myDataSource.getConnection();
@@ -716,7 +778,64 @@ public class DAO {
                 ResultSet rs = stmt.executeQuery(sql)){
             while(rs.next()){
                 String desc = rs.getString("DESCRIPTION");
-                res.put(desc, caPourTypeProduit(rs.getString("PROD_CODE")));
+                res.put(desc, caPourTypeProduit(rs.getString("PROD_CODE"),new Date(debut.getTime()),new Date(fin.getTime())));
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+
+    /**
+     * 
+     * @param id
+     * @param debut
+     * @param fin
+     * @return le chiffre d'affaires pour un client
+     * @throws DAOException 
+     */
+    public float caPourClient(int id, Date debut, Date fin) throws DAOException{
+        float res =0;
+        String sql = "SELECT ORDER_NUM FROM PURCHASE_ORDER "
+                + "WHERE CUSTOMER_ID = ? AND "
+                + "SALES_DATE BETWEEN ? AND ?";
+        try(Connection connexion = myDataSource.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(sql);){
+            stmt.setInt(1, id);
+            stmt.setDate(2, debut);
+            stmt.setDate(3, fin);
+            try(ResultSet r = stmt.executeQuery();){
+                while(r.next()){
+                   Prix p =getPrix(r.getInt("ORDER_NUM"));
+                   res += p.gains();
+                }
+            }
+        }
+        catch(SQLException ex){
+            Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+            throw new DAOException(ex.getMessage());
+        }
+        return res;
+    }
+    
+    /**
+     * 
+     * @param debut
+     * @param fin
+     * @return  le chiffre d'affaire de chaque client
+     * @throws DAOException 
+     */
+    public Map<String,Float> caParClientPourPeriode(java.util.Date debut, java.util.Date fin) throws DAOException {
+        HashMap<String,Float> res=new HashMap();
+        String sql = "SELECT CUSTOMER_ID, NAME FROM CUSTOMER";
+        try(Connection connexion = myDataSource.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+            while(rs.next()){
+                String name = rs.getString("NAME");
+                res.put(name, caPourClient(rs.getInt("CUSTOMER_ID"),new Date(debut.getTime()),new Date(fin.getTime())));
             }
         }
         catch(SQLException ex){

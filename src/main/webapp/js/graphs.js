@@ -3,10 +3,10 @@ google.charts.load('current', {
     'packages': ['geochart', 'corechart', 'bar'],
     // Note: you will need to get a mapsApiKey for your project.
     // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-    'mapsApiKey': //maps API Key ici Demandez moi si vous la voulez -Alex
+    //mapsApiKey ici Demandez moi si vous la voulez -Alex
 });
 google.charts.setOnLoadCallback(drawMarkersMap);
-//google.charts.setOnLoadCallback(drawStacked);
+google.charts.setOnLoadCallback(drawStacked);
 google.charts.setOnLoadCallback(drawChart);
 
 function drawMarkersMap() {
@@ -33,20 +33,21 @@ function drawMarkersMap() {
     chart.draw(data, options);
 }
 
-/*function drawStacked() {
-    var prod = [];
-    prod.push(['Type Produit', "Pourcentage du Chiffre affaire"]);
+function drawStacked() {
+    var cli = [];
+    cli.push(['Client', "Pourcentage du Chiffre affaire"]);
     var input = $(".input-bar");
     var caTotal = $("#chiffreAffaire").attr("value");
     for (i of input) {
         var type = $(i).attr("id");
         var ca = 100 * $(i).attr("value") / caTotal;
-        prod.push([type, ca]);
+        cli.push([type, ca]);
     }
-    var data = google.visualization.arrayToDataTable(prod);
+    console.log(cli);
+    var data = google.visualization.arrayToDataTable(cli);
 
     var options = {
-        title: "Pourcentage du chiffre d'affaire par type de produit" ,
+        title: "Pourcentage du chiffre d'affaire par Client" ,
         chartArea: {width: '50%'},
         isStacked: true,
         hAxis: {
@@ -54,12 +55,12 @@ function drawMarkersMap() {
             minValue: 0
         },
         vAxis: {
-            title: 'Type de produit'
+            title: 'Client'
         }
     };
     var chart = new google.visualization.BarChart(document.getElementById('bar_affichage'));
     chart.draw(data, options);
-}*/
+}
 
       
 function drawChart() {

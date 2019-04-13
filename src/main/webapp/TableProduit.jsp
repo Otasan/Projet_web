@@ -42,7 +42,7 @@
 
                 <!-- Sidebar - Brand -->
                 <!--Retour vers commandes-->
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="Client.html">
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                     <div class="sidebar-brand-icon rotate-n-15">
                         <i class="fas fa-laugh-wink"></i>
                     </div>
