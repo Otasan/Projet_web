@@ -240,7 +240,7 @@
                                             <input type="date" id="end-ca-article" name="end-ca-article" value="<%=(String) request.getAttribute("end-ca-article")%>"/>
                                         </li>
                                         <li>
-                                            <button type="submit" name="action" value="updateDate">Valider</button>
+                                            <button type="submit" class="btn btn-secondary bg-primary" name="action" value="updateDate">Valider</button>
                                         </li>
                                     </ul>
                                     <div class="dropdown" id='input-pie'>
@@ -269,7 +269,7 @@
                                             <input type="date" id="end-zone-geo" name="end-zone-geo" value="<%=(String) request.getAttribute("end-zone-geo")%>">
                                         </li>
                                         <li>
-                                            <button type="submit" name="action" value="updateDate">Valider</button>
+                                            <button type="submit" class="btn btn-secondary bg-primary" name="action" value="updateDate">Valider</button>
                                         </li>
                                     </ul>
                                     <div class="dropdown" id="input-carte">
@@ -298,7 +298,7 @@
                                             <input type="date" id="end-client" name="end-client" value="<%=(String) request.getAttribute("end-client")%>">
                                         </li>
                                         <li>
-                                            <button type="submit" name="action" value="updateDate">Valider</button>
+                                            <button type="submit" class="btn btn-secondary bg-primary" name="action" value="updateDate">Valider</button>
                                         </li>
                                     </ul>
                                     <div class="dropdown" id="input-bar">
