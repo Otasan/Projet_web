@@ -230,7 +230,7 @@
                                                         <!--Prix calculé à partir de la commande-->
                                                     </td>
                                                     <td>
-                                                        <button id="target" type="submit" name="action" value="valider">Valider la commande</button>
+                                                        <button id="target" class="btn btn-secondary bg-primary" type="submit" name="action" value="valider">Valider la commande</button>
                                                     </td>
                                                 </tr>
                                             </tbody>
